@@ -12,19 +12,17 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:mathis.helloWorld",
-		"onCommand:mathis.showTime"
+		"onLanguage:javascript",
+		"onLanguage:javascriptreact",
+		"onLanguage:typescript",
+		"onLanguage:typescriptreact"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "mathis.helloWorld",
-				"title": "Hello World"
-			},
-			{
-				"command": "mathis.showTime",
-				"title": "show time"
+				"command": "mathis.test",
+				"title": "mathis test"
 			}
 		]
 	},
