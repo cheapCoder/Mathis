@@ -1,6 +1,8 @@
 import * as vscode from "vscode";
 import { readFile as rf } from "fs";
 import { promisify } from "util";
+import * as parser from "@babel/parser";
+import traverse from "@babel/traverse";
 
 const readFile = promisify(rf);
 
@@ -11,13 +13,27 @@ async function getWord() {
 	);
 	console.log(allLocaleFiles);
 	const filesContents = await Promise.all(
-		allLocaleFiles.map((file) => readFile(file.path, { encoding: "utf-8" }))
+		allLocaleFiles.map((file) => readFile(file.fsPath, { encoding: "utf-8" }))
 	);
 
 	let contentsObj = filesContents.map((fileContent, i) => ({
-		path: allLocaleFiles[i].path,
+		path: allLocaleFiles[i].fsPath,
 		content: fileContent,
 	}));
+	const ast = parser.parse(contentsObj[0].content, {
+		sourceType: "module",
+		// plugins: ["typescript"],
+	});
+
+	traverse(ast, {
+		enter(path) {
+			console.log(path);
+
+			if (path.isIdentifier({ name: "n" })) {
+				path.node.name = "x";
+			}
+		},
+	});
 
 	// TODO: 太难懂
 	let locales = contentsObj.reduce((locales, { content, path }) => {
