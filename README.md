@@ -68,3 +68,11 @@ Ensure that you've read through the extensions guidelines and follow the best pr
 * [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
 
 **Enjoy!**
+
+
+### i18n-ally不支持
+
+- i18n库的format函数内使用三元判断id时无法检测到
+- 无locale源文件映射到应用文件
+
+工具：[ast explorer](https://astexplorer.net/)

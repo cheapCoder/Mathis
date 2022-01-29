@@ -3,11 +3,15 @@ declare interface AstLocation {
 	column: number;
 }
 
-declare interface LocaleConfig {
-	value: "string";
-	path: "string";
-	locations: {
-		key: { start: AstLocation; end: AstLocation };
-		value: { start: AstLocation; end: AstLocation };
-	};
+declare interface LocaleFile {
+	[key: string]: string;
 }
+
+declare interface AstMeta {
+	lang?: string;
+	uri?: import("vscode").Uri;
+}
+
+declare type CurFileType = "define" | "apply";
+
+declare type I18nLibType = "react-intl" | "svelte-i18n" | undefined;
