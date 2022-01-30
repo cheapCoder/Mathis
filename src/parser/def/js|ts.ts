@@ -1,7 +1,6 @@
-// import { parse } from "@babel/parser";
 import { Parser } from "acorn";
 import { Range } from "vscode";
-import { DefNode } from "../../manger/nodes";
+import { DefNode } from "../../manger";
 
 export default function tsParse(text: string, meta: AstMeta = {}): void {
 	const ast = Parser.parse(text, { ecmaVersion: "latest", sourceType: "module", locations: true });

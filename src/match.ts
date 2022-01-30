@@ -1,9 +1,3 @@
-// export function addLocale(arr: LocaleFile[]) {}
-
-// export const matchFile = () => {
-
-// }
-
 // TODO:restricts改为正则
 export function getRestrictValue(str: string, expandIndex: number, restricts: string[]) {
 	if (expandIndex < 0 || expandIndex >= str.length) {
@@ -31,8 +25,4 @@ export function getRestrictValue(str: string, expandIndex: number, restricts: st
 
 	// 去除限制符
 	return str.substring(start + 1, end); // substring不包含结束值
-}
-
-function getI18nLib(){
-	
 }

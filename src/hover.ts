@@ -1,38 +1,93 @@
-import { Hover, MarkdownString } from "vscode";
+import { CancellationToken, Hover, MarkdownString, Position, TextDocument } from "vscode";
+import manger from "./manger";
 import { getRestrictValue } from "./match";
-import nodeManger from "./manger/nodes";
 
-export const showLocaleHover = () => ({
-	provideHover(document, position, token) {
-		const curWord = getRestrictValue(document.getText(), document.offsetAt(position), ["'", '"']);
-
-		const matchWord = nodeManger.defs[curWord];
-
-		if (!matchWord) {
-			return;
-		}
-
-		const markdownStrings = Object.keys(matchWord).map((lan) => {
-			const ms = new MarkdownString(
-				// `[${locale.value}](${locale.path}#${locale.locations.key.start.line})  [$(explorer-view-icon)](command:mathis.copyValue)`,
-				`${
-					matchWord[lan].value
-				} [$(keybindings-edit)](command:mathis.definition?${encodeURIComponent(
-					JSON.stringify(matchWord[lan])
-				)})  [$(explorer-view-icon)](command:mathis.copy?${encodeURIComponent(
-					JSON.stringify({
-						value: matchWord[lan].value,
-					})
-				)})`,
-				true
-			);
-
-			ms.isTrusted = true;
-			ms.supportHtml = true;
-
-			return ms;
-		});
-
-		return new Hover(markdownStrings);
+export const dispatchHover = () => ({
+	provideHover(...args: [TextDocument, Position, CancellationToken]) {
+		return manger.activeFileType === "define"
+			? showApplyHover(...args)
+			: showDefHover(...args);
 	},
 });
+
+const showDefHover = (document: TextDocument, position: Position, token) => {
+	const curWord = getRestrictValue(document.getText(), document.offsetAt(position), [
+		"'",
+		'"',
+		"`",
+	]);
+	const matchWord = manger.keyMap[curWord];
+
+	if (!matchWord) {
+		return;
+	}
+
+	const markdownStrings = Object.keys(matchWord).map((lan) => {
+		const ms = new MarkdownString(
+			// `[${locale.value}](${locale.path}#${locale.locations.key.start.line})  [$(explorer-view-icon)](command:mathis.copyValue)`,
+			`${lan} ${
+				matchWord[lan].value
+			} [$(keybindings-edit)](command:mathis.definition?${encodeURIComponent(
+				JSON.stringify(matchWord[lan])
+			)} "更改文案")  [$(explorer-view-icon)](command:mathis.copy?${encodeURIComponent(
+				JSON.stringify({
+					value: matchWord[lan].value,
+				})
+			)} "复制")`,
+			true
+		);
+
+		ms.isTrusted = true;
+		ms.supportHtml = true;
+
+		return ms;
+	});
+
+	return new Hover(markdownStrings);
+};
+
+const showApplyHover = (document: TextDocument, position: Position, token) => {
+	position = position.translate(1, 1);
+
+	// 获取语言
+	const filename = document.fileName.split("/").pop().split(".");
+	filename.pop();
+	const lang = filename.join(".");
+
+	if (!manger.supportLang.has(lang)) {
+		// window.showErrorMessage("未找到此定义类型文件的语言类型");
+		return;
+	}
+
+	const key = Object.keys(manger.keyMap).find(
+		(key) =>
+			manger.keyMap[key][lang].defUri.fsPath === document.fileName &&
+			((manger.keyMap[key][lang].keyRange.start.isBefore(position) &&
+				manger.keyMap[key][lang].keyRange.end.isAfter(position)) ||
+				(manger.keyMap[key][lang].valueRange.start.isBefore(position) &&
+					manger.keyMap[key][lang].valueRange.end.isAfter(position)))
+	);
+	console.log(key);
+
+	if (!key) {
+		return;
+	}
+
+	console.log(manger.applyMap[key]);
+
+	const str = manger.applyMap[key].map((apply) => {
+		const ms = new MarkdownString(
+			`[${apply.path.replace(
+				/^.*src/,
+				"src"
+			)}](command:mathis.navigate?${encodeURIComponent(
+				JSON.stringify(apply)
+			)} "跳转链接")`,
+			true
+		);
+		ms.isTrusted = true;
+		return ms;
+	});
+
+	return new Hover(str);
+};

@@ -1,26 +1,43 @@
-import { readFile } from "fs/promises";
-import { Uri } from "vscode";
+import { Uri, workspace } from "vscode";
 
-import nodeManger from "../../manger/nodes";
+import manger from "../../manger";
 import tsParse from "./js|ts";
 import jsonParse from "./json";
 
-const parserMap = {
-	json: jsonParse,
-	js: tsParse,
-	ts: tsParse,
-};
+class Def {
+	// TODO:static
+	private parserMap = {
+		json: jsonParse,
+		js: tsParse,
+		ts: tsParse,
+	};
 
-export const dispatchDefParse = async (uris: Uri | Uri[]) => {
-	Array.isArray(uris) || (uris = [uris]);
+	public matchUris: Uri[] = [];
 
-	const contents = await Promise.all(uris.map((u) => readFile(u.fsPath, { encoding: "utf-8" })));
-	contents.forEach(async (content, i) => {
-		const filename = uris[i].fsPath.split("/").pop();
-		const ext = filename.split(".")[1];
-		const lang = filename.split(".")[0];
+	public async init() {
+		// TODO:可配置
+		// ts,js,json格式的多语言文件
+		this.matchUris = await workspace.findFiles(
+			"**/locale/{en_US,zh_CN}.{ts,js,json}",
+			"**/node_modules/**"
+		);
 
-		const nodes = parserMap[ext](content, { uri: uris[i], lang });
-		nodeManger.addNodes(nodes, lang, "defs");
-	});
-};
+		await this.dispatchDefParse();
+	}
+
+	public async dispatchDefParse() {
+		const arrs = await Promise.all(this.matchUris.map((u) => workspace.fs.readFile(u)));
+		arrs
+			.map((a) => a.toString())
+			.forEach(async (content, i) => {
+				const filename = this.matchUris[i].fsPath.split("/").pop().split(".");
+				const ext = filename.pop();
+				const lang = filename.join(".");
+
+				const nodes = this.parserMap[ext](content, { uri: this.matchUris[i], lang });
+				manger.addDef(nodes, lang);
+			});
+	}
+}
+
+export default new Def();
