@@ -15,6 +15,8 @@ export const disDefinition = commands.registerCommand(
 			defUri,
 			valueRange: [start, end],
 		} = args;
+		console.log(args);
+
 		const defDocument = await workspace.openTextDocument(defUri);
 		const defEditor = await window.showTextDocument(defDocument);
 
@@ -23,18 +25,18 @@ export const disDefinition = commands.registerCommand(
 			start.line - 1,
 			start.character - 1,
 			end.line - 1,
-			end.character - 1
+			end.character
 		);
+		console.log(defEditor);
+
 		defEditor.revealRange(defEditor.selection, TextEditorRevealType.InCenter);
-		// commands.executeCommand("workbench.action.focusActiveEditorGroup");
 	}
 );
 
 // 复制
 export const disCopy = commands.registerCommand("mathis.copy", (args) => {
-	args = {};
 	if (!args.value) {
-		window.showInformationMessage("未找到值...", "确定");
+		window.showInformationMessage("未找到值...");
 		return;
 	}
 	env.clipboard.writeText(args.value).then(() => {
@@ -44,16 +46,24 @@ export const disCopy = commands.registerCommand("mathis.copy", (args) => {
 
 // 跳转文件
 export const disNav = commands.registerCommand("mathis.navigate", async (args) => {
+	console.log(args);
+
 	if (!args) {
 		window.showInformationMessage("缺失参数");
 		return;
 	}
 
-	const document = await workspace.openTextDocument(args.path);
-	// const start = document.positionAt(args.offset);
+	const { range, path } = args;
+
+	const document = await workspace.openTextDocument(path);
 	const editor = await window.showTextDocument(document);
 
-	// editor.selection = new Selection(start, start.translate(0, args.key.length));
-	editor.selection = new Selection(0, 0, 3, 3);
+	editor.selection = new Selection(
+		range[0].line,
+		range[0].character,
+		range[1].line,
+		range[1].character
+	);
+	// editor.selection = new Selection(0, 0, 3, 3);
 	editor.revealRange(editor.selection, TextEditorRevealType.InCenter);
 });

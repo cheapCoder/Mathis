@@ -1,12 +1,10 @@
 import { ExtensionContext, languages } from "vscode";
 import * as commands from "./command";
 import { dispatchHover } from "./hover";
-import manger from "./manger";
+import "./manger";
 
 export function activate(context: ExtensionContext) {
 	console.log(context);
-
-	manger.init();
 
 	const activeLang = context.extension.packageJSON.activationEvents
 		.filter((s: string) => s.startsWith("onLanguage"))

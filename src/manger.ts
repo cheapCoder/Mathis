@@ -3,29 +3,34 @@ import applyParser from "./parser/apply";
 import defParser from "./parser/def";
 
 class Manger {
-	// TODO: bug
 	public activeFileType: ActiveFileType = "apply";
 	public i18nLib: I18nLibType;
 	public supportLang: Set<string> = new Set();
 	public keyMap: LocaleMapType = {};
-	public applyMap: { [key: string]: ApplyInfo[] } = {};
+	public applyMap: { [key: string]: ApplyInfo[] } | undefined;
 
 	constructor() {
-		workspace.onDidChangeTextDocument((e) => {
-			// console.log(e);
-		});
+		this.init();
+
 		window.onDidChangeActiveTextEditor((e) => {
 			this.activeFileType = defParser.matchUris.find(
 				(u) => u.fsPath === e.document.fileName
 			)
 				? "define"
 				: "apply";
-			console.log(this);
+
+			// 懒加载到打开locale文件时再实例化
+			if (this.activeFileType === "define" && !this.applyMap) {
+				applyParser.init();
+				// console.log(this);
+				// console.log(Object.keys(this.keyMap).length);
+				// console.log(Object.keys(this.applyMap).length);
+			}
 		});
-		// this.init();
 	}
 
 	public async init() {
+		// 查找依赖库
 		try {
 			const path = (await workspace.findFiles("package.json"))[0].fsPath;
 			const packageJson = (await import(path))["default"];
@@ -39,7 +44,6 @@ class Manger {
 
 		await defParser.init();
 
-		await applyParser.init();
 		this.activeFileType = defParser.matchUris.find(
 			(u) => u.fsPath === window.activeTextEditor.document.fileName
 		)
@@ -47,6 +51,8 @@ class Manger {
 			: "apply";
 
 		console.log(this);
+		console.log(Object.keys(this.keyMap).length);
+		console.log(Object.keys(this.applyMap));
 	}
 
 	public addDef(n: DefNode | DefNode[], lang: string) {
@@ -60,23 +66,28 @@ class Manger {
 		this.supportLang.add(lang);
 	}
 
-	public addApply(key: string, path: string, offset: number) {
+	public addApply(
+		key: string,
+		path: string,
+		range: Range,
+		meta: { code: string; languageId: string }
+	) {
 		Array.isArray(this.applyMap[key]) || (this.applyMap[key] = []);
-		this.applyMap[key].push({ path, offset, key });
+
+		this.applyMap[key].push({ path, range, key, ...meta });
 	}
 }
 
 export default new Manger();
 
 export class DefNode {
-	// TODO:优化写法
 	public constructor(
-		key: string,
-		value: string,
-		keyRange: Range,
-		valueRange: Range,
-		lang: string,
-		defUri: Uri
+		public key: string,
+		public value: string,
+		public keyRange: Range,
+		public valueRange: Range,
+		public lang: string,
+		public defUri: Uri
 	) {
 		this.key = key;
 		this.value = value;
@@ -85,10 +96,4 @@ export class DefNode {
 		this.keyRange = keyRange;
 		this.valueRange = valueRange;
 	}
-	key: string;
-	value: string;
-	lang: string;
-	defUri: Uri;
-	keyRange: Range;
-	valueRange: Range;
 }

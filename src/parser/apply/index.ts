@@ -1,11 +1,9 @@
-import { Uri, workspace } from "vscode";
+import { Range, Uri, workspace } from "vscode";
 import manger from "../../manger";
 import defParser from "../def/index";
 
-// TODO: 懒加载到打开locale文件时再实例化
 class ApplyParser {
 	public libFormatRegMap = {
-		// TODO:正则不可加全局匹配g
 		"react-intl": [
 			/(?<=((props\.)?intl\.)?formatMessage\(\s*{\s*id:\s+['"])([a-zA-Z\._]+)(?=['"])/,
 		],
@@ -25,20 +23,34 @@ class ApplyParser {
 			(au) => !defParser.matchUris.find((du) => du.fsPath === au.fsPath)
 		);
 
-		const arrs = await Promise.all(this.matchUris.map((u) => workspace.fs.readFile(u)));
+		let arrs = (
+			await Promise.all(this.matchUris.map((u) => workspace.fs.readFile(u)))
+		).map((a) => a.toString());
 
-		arrs
-			.map((a) => a.toString())
-			.forEach((text, i) => {
-				this.libFormatRegMap[manger.i18nLib].forEach(async (reg) => {
-					let tem;
-					const r = new RegExp(reg, "g");
-					while ((tem = r.exec(text))) {
-						// NOTE: 索引
-						manger.addApply(tem[0], this.matchUris[i].fsPath, tem.index);
-					}
-				});
+		// TODO: check bug
+		arrs.forEach((text, i) => {
+			// for (let i = 0; i < arrs.length; i++) {
+			// const text = arrs[i];
+
+			this.libFormatRegMap[manger.i18nLib].forEach(async (reg) => {
+				// for (let j = 0; j < this.libFormatRegMap[manger.i18nLib.length]; j++) {
+				// const reg = this.libFormatRegMap[manger.i18nLib[j]];
+
+				let tem;
+				const r = new RegExp(reg, "g");
+				while ((tem = r.exec(text))) {
+					const document = await workspace.openTextDocument(this.matchUris[i]);
+					const start = document.positionAt(tem.index);
+					const end = start.translate(0, tem[0].length);
+
+					// NOTE: 索引
+					manger.addApply(tem[0], this.matchUris[i].fsPath, new Range(start, end), {
+						code: document.lineAt(start.line).text.trim(),
+						languageId: document.languageId,
+					});
+				}
 			});
+		});
 	}
 
 	private async dispatchApplyParser(uris: Uri | Uri[]) {

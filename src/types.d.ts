@@ -20,4 +20,10 @@ declare type LocaleMapType = {
 	[value: string]: { [lang: string]: import("./manger").DefNode };
 };
 
-declare type ApplyInfo = { key: string; path: string; offset: number };
+declare type ApplyInfo = {
+	key: string;
+	path: string;
+	range: import("vscode").Range;
+	code: string;
+	languageId: string;
+};
