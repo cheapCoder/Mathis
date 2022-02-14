@@ -12,13 +12,7 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onLanguage:javascript",
-		"onLanguage:javascriptreact",
-		"onLanguage:typescript",
-		"onLanguage:typescriptreact",
-		"onLanguage:svelte",
-		"onLanguage:json",
-		"onLanguage:jsonc"
+		"workspaceContains:**/locale/**/*.{js,ts,jsx,tsx,json}"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -34,6 +28,18 @@
 					".svelte"
 				],
 				"configuration": "./language-configuration.json"
+			}
+		],
+		"configuration": [
+			{
+				"title": "LocaleMatch",
+				"properties": {
+					"defSelect": {
+						"title": "defSelect",
+						"description": "select the key or the value part",
+						"type":"array"
+					}
+				}
 			}
 		]
 	},

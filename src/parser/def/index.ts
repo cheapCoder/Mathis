@@ -5,12 +5,13 @@ import tsParse from "./js|ts";
 import jsonParse from "./json";
 
 class Def {
-	// TODO:static
-	private parserMap = {
+	private static parserMap = {
 		json: jsonParse,
 		js: tsParse,
 		ts: tsParse,
 	};
+
+	public isReady = false;
 
 	public matchUris: Uri[] = [];
 
@@ -23,20 +24,22 @@ class Def {
 		);
 
 		await this.dispatchDefParse();
+		this.isReady = true;
 	}
 
 	public async dispatchDefParse() {
-		const arrs = await Promise.all(this.matchUris.map((u) => workspace.fs.readFile(u)));
-		arrs
-			.map((a) => a.toString())
-			.forEach(async (content, i) => {
-				const filename = this.matchUris[i].fsPath.split("/").pop().split(".");
-				const ext = filename.pop();
-				const lang = filename.join(".");
+		const arrs = (
+			await Promise.all(this.matchUris.map((u) => workspace.fs.readFile(u)))
+		).map((a) => a.toString());
 
-				const nodes = this.parserMap[ext](content, { uri: this.matchUris[i], lang });
-				manger.addDef(nodes, lang);
-			});
+		arrs.forEach(async (content, i) => {
+			const filename = this.matchUris[i].fsPath.split("/").pop().split(".");
+			const ext = filename.pop();
+			const lang = filename.join(".");
+
+			const nodes = Def.parserMap[ext](content, { uri: this.matchUris[i], lang });
+			manger.addDef(nodes, lang);
+		});
 	}
 }
 

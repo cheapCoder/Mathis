@@ -1,13 +1,29 @@
-import { Range, Uri, window, workspace } from "vscode";
+import { ExtensionContext, Location, Range, Uri, window, workspace } from "vscode";
 import applyParser from "./parser/apply";
 import defParser from "./parser/def";
 
+// TODO: 支持代码补全
 class Manger {
-	public activeFileType: ActiveFileType = "apply";
 	public i18nLib: I18nLibType;
 	public supportLang: Set<string> = new Set();
+	public context: ExtensionContext;
+	public defParser = defParser;
+	public applyParser = applyParser;
 	public keyMap: LocaleMapType = {};
 	public applyMap: { [key: string]: ApplyInfo[] } | undefined;
+
+	private _activeFileType: ActiveFileType = "apply";
+	public get activeFileType() {
+		return this._activeFileType;
+	}
+	public set activeFileType(val) {
+		this._activeFileType = val;
+
+		// 懒加载到打开locale文件时再实例化
+		if (val === "define" && !this.applyMap) {
+			applyParser.init();
+		}
+	}
 
 	constructor() {
 		this.init();
@@ -19,13 +35,7 @@ class Manger {
 				? "define"
 				: "apply";
 
-			// 懒加载到打开locale文件时再实例化
-			if (this.activeFileType === "define" && !this.applyMap) {
-				applyParser.init();
-				// console.log(this);
-				// console.log(Object.keys(this.keyMap).length);
-				// console.log(Object.keys(this.applyMap).length);
-			}
+			console.log(this);
 		});
 	}
 
@@ -51,8 +61,6 @@ class Manger {
 			: "apply";
 
 		console.log(this);
-		console.log(Object.keys(this.keyMap).length);
-		console.log(Object.keys(this.applyMap));
 	}
 
 	public addDef(n: DefNode | DefNode[], lang: string) {
@@ -68,13 +76,15 @@ class Manger {
 
 	public addApply(
 		key: string,
-		path: string,
-		range: Range,
+		// uri: Uri,
+		// range: Range,
+		location: Location,
 		meta: { code: string; languageId: string }
 	) {
+		this.applyMap ||= {};
 		Array.isArray(this.applyMap[key]) || (this.applyMap[key] = []);
 
-		this.applyMap[key].push({ path, range, key, ...meta });
+		this.applyMap[key].push({ location, key, ...meta });
 	}
 }
 

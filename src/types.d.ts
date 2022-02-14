@@ -22,8 +22,7 @@ declare type LocaleMapType = {
 
 declare type ApplyInfo = {
 	key: string;
-	path: string;
-	range: import("vscode").Range;
+	location: import("vscode").Location;
 	code: string;
 	languageId: string;
 };

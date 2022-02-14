@@ -1,4 +1,4 @@
-export function getRestrictValue(str: string, expandIndex: number, restricts: RegExp) {
+export function getRestrictValue(str: string, expandIndex: number, restricts: string[]) {
 	if (expandIndex < 0 || expandIndex >= str.length) {
 		return "";
 	}
@@ -7,15 +7,15 @@ export function getRestrictValue(str: string, expandIndex: number, restricts: Re
 
 	// 若start到0还没检测到限制符，则为0，所以不用等于0
 	while (start > 0) {
-		if (restricts.test(str[start])) {
+		if (restricts.includes(str[start])) {
 			break;
 		} else {
 			start--;
 		}
 	}
-	// end同理
+	// end
 	while (end < str.length - 1) {
-		if (restricts.test(str[end])) {
+		if (restricts.includes(str[end])) {
 			break;
 		} else {
 			end++;

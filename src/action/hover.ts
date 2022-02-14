@@ -1,11 +1,10 @@
 import { CancellationToken, Hover, MarkdownString, Position, TextDocument } from "vscode";
-import manger from "./manger";
-import { getRestrictValue } from "./match";
+import config from "../config";
+import manger from "../manger";
+import { getRestrictValue } from "../util";
 
 export const dispatchHover = () => ({
 	provideHover(...args: [TextDocument, Position, CancellationToken]) {
-		console.log(manger.activeFileType);
-
 		return manger.activeFileType === "define"
 			? showApplyHover(...args)
 			: showDefHover(...args);
@@ -14,9 +13,9 @@ export const dispatchHover = () => ({
 
 const showDefHover = (document: TextDocument, position: Position, token) => {
 	const curWord = getRestrictValue(
-		document.getText(),
-		document.offsetAt(position),
-		/['"`]/
+		document.lineAt(position.line).text,
+		position.character,
+		config.splitLetters
 	);
 	const matchWord = manger.keyMap[curWord];
 
@@ -25,8 +24,6 @@ const showDefHover = (document: TextDocument, position: Position, token) => {
 	}
 
 	const markdownStrings = Object.keys(matchWord).map((lan) => {
-		console.log(JSON.stringify(matchWord[lan]));
-
 		const ms = new MarkdownString(
 			`${lan}: ${
 				matchWord[lan].value
@@ -51,7 +48,6 @@ const showDefHover = (document: TextDocument, position: Position, token) => {
 
 const showApplyHover = (document: TextDocument, position: Position, token) => {
 	// TODO: 提供可关闭hover显示的配置
-
 	position = position.translate(1, 1);
 
 	// 获取语言
@@ -65,32 +61,24 @@ const showApplyHover = (document: TextDocument, position: Position, token) => {
 	}
 
 	const key = Object.keys(manger.keyMap).find((key) => {
-		// if (key === "staff.credit_card_tips") {
-		// 	console.log(manger.keyMap[key][lang]);
-		// 	console.log(position);
-		// }
-
 		// TODO: 实现一个lru队列存储文件地址，优先查找最近使用的def文件，优化读取，获取前一个找到的文件，优先从此文件读取
 		return (
-			manger.keyMap[key][lang].defUri.fsPath === document.fileName &&
-			((manger.keyMap[key][lang].keyRange.start.isBefore(position) &&
-				manger.keyMap[key][lang].keyRange.end.isAfter(position)) ||
-				(manger.keyMap[key][lang].valueRange.start.isBefore(position) &&
-					manger.keyMap[key][lang].valueRange.end.isAfter(position)))
+			manger.keyMap[key][lang]?.defUri.fsPath === document.fileName &&
+			((manger.keyMap[key][lang]?.keyRange.start.isBeforeOrEqual(position) &&
+				manger.keyMap[key][lang]?.keyRange.end.isAfterOrEqual(position)) ||
+				(manger.keyMap[key][lang]?.valueRange.start.isBeforeOrEqual(position) &&
+					manger.keyMap[key][lang]?.valueRange.end.isAfterOrEqual(position)))
 		);
 	});
-	// console.log("key: " + key);
 
 	if (!key) {
 		return;
 	}
 
-	// console.log(manger.applyMap[key]);
-
 	const str = manger.applyMap[key].map((apply) => {
 		const ms = new MarkdownString(
-			`地址: [${apply.path.replace(/^.*src/, "")}#${
-				apply.range.start.line + 1
+			`地址: [${apply.location.uri.fsPath.replace(/^.*src/, "")}#${
+				apply.location.range.start.line + 1
 			}](command:mathis.navigate?${encodeURIComponent(
 				JSON.stringify(apply)
 			)} "跳转链接")`,

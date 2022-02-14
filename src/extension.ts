@@ -1,16 +1,13 @@
 import { ExtensionContext, languages } from "vscode";
-import * as commands from "./command";
-import { dispatchHover } from "./hover";
-import "./manger";
+import * as commands from "./action/command";
+import { dispatchHover } from "./action/hover";
+import config from "./config";
+import manger from "./manger";
 
 export function activate(context: ExtensionContext) {
-	console.log(context);
+	manger.context = context;
 
-	const activeLang = context.extension.packageJSON.activationEvents
-		.filter((s: string) => s.startsWith("onLanguage"))
-		.map((lang: string) => lang.replace("onLanguage:", ""));
-
-	languages.registerHoverProvider(activeLang, dispatchHover());
+	languages.registerHoverProvider(config.activeFileLanguage, dispatchHover());
 
 	context.subscriptions.push(...Object.keys(commands).map((name) => commands[name]));
 }
