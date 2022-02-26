@@ -38,6 +38,9 @@
 						"title": "defSelect",
 						"description": "select the key or the value part",
 						"type":"array"
+					},
+					"applyDelta": {
+						"type": "string"
 					}
 				}
 			}

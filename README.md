@@ -1,6 +1,6 @@
-# mathis README
+# mathis 
 
-This is the README for your extension "mathis". After writing up a brief description, we recommend including the following sections.
+a extension for making i18n looking convenient
 
 ## Features
 

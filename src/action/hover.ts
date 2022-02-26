@@ -75,7 +75,7 @@ const showApplyHover = (document: TextDocument, position: Position, token) => {
 		return;
 	}
 
-	const str = manger.applyMap[key].map((apply) => {
+	const str = manger.applyMap[key]?.map((apply) => {
 		const ms = new MarkdownString(
 			`地址: [${apply.location.uri.fsPath.replace(/^.*src/, "")}#${
 				apply.location.range.start.line + 1
@@ -89,6 +89,9 @@ const showApplyHover = (document: TextDocument, position: Position, token) => {
 		ms.isTrusted = true;
 		return ms;
 	});
+	if (!str) {
+		return;
+	}
 
 	return new Hover(str);
 };

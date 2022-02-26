@@ -55,12 +55,13 @@ class Manger {
 		await defParser.init();
 
 		this.activeFileType = defParser.matchUris.find(
-			(u) => u.fsPath === window.activeTextEditor.document.fileName
+			(u) => u.fsPath === window.activeTextEditor?.document.fileName
 		)
 			? "define"
 			: "apply";
 
 		console.log(this);
+		console.timeEnd("mathis");
 	}
 
 	public addDef(n: DefNode | DefNode[], lang: string) {
