@@ -1,8 +1,8 @@
 import parser from "json-to-ast";
 import { Range } from "vscode";
-import { DefNode } from "../../manger";
+import { DefNode } from ".";
 
-export default function jsonParse(text: string, meta: AstMeta = {}): DefNode {
+export default function jsonParse(text: string, meta: AstMeta = {}): DefNode[] {
 	const { lang, uri } = meta;
 
 	return parser(text)["children"].map((n) => {

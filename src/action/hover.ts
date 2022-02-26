@@ -1,3 +1,4 @@
+import path from "path";
 import { CancellationToken, Hover, MarkdownString, Position, TextDocument } from "vscode";
 import config from "../config";
 import manger from "../manger";
@@ -17,7 +18,7 @@ const showDefHover = (document: TextDocument, position: Position, token) => {
 		position.character,
 		config.splitLetters
 	);
-	const matchWord = manger.keyMap[curWord];
+	const matchWord = manger.defMap[curWord];
 
 	if (!matchWord) {
 		return;
@@ -51,23 +52,22 @@ const showApplyHover = (document: TextDocument, position: Position, token) => {
 	position = position.translate(1, 1);
 
 	// 获取语言
-	const filename = document.fileName.split("/").pop().split(".");
-	filename.pop();
-	const lang = filename.join(".");
+	const lang = path.parse(document.fileName).name;
 
 	if (!manger.supportLang.has(lang)) {
 		// window.showErrorMessage("未找到此定义类型文件的语言类型");
 		return;
 	}
+	new Map().values;
 
-	const key = Object.keys(manger.keyMap).find((key) => {
+	const key = manger.defMap[document.uri.fsPath].values()find((node) => {
 		// TODO: 实现一个lru队列存储文件地址，优先查找最近使用的def文件，优化读取，获取前一个找到的文件，优先从此文件读取
 		return (
-			manger.keyMap[key][lang]?.defUri.fsPath === document.fileName &&
-			((manger.keyMap[key][lang]?.keyRange.start.isBeforeOrEqual(position) &&
-				manger.keyMap[key][lang]?.keyRange.end.isAfterOrEqual(position)) ||
-				(manger.keyMap[key][lang]?.valueRange.start.isBeforeOrEqual(position) &&
-					manger.keyMap[key][lang]?.valueRange.end.isAfterOrEqual(position)))
+			node?.defUri.fsPath === document.fileName &&
+			((manger.defMap[key]?.keyRange.start.isBeforeOrEqual(position) &&
+				manger.defMap[key]?.keyRange.end.isAfterOrEqual(position)) ||
+				(manger.defMap[key]?.valueRange.start.isBeforeOrEqual(position) &&
+					manger.defMap[key]?.valueRange.end.isAfterOrEqual(position)))
 		);
 	});
 
@@ -75,20 +75,20 @@ const showApplyHover = (document: TextDocument, position: Position, token) => {
 		return;
 	}
 
-	const str = manger.applyMap[key].map((apply) => {
-		const ms = new MarkdownString(
-			`地址: [${apply.location.uri.fsPath.replace(/^.*src/, "")}#${
-				apply.location.range.start.line + 1
-			}](command:mathis.navigate?${encodeURIComponent(
-				JSON.stringify(apply)
-			)} "跳转链接")`,
-			true
-		);
+	// const str = manger.applyMap[key].map((apply) => {
+	// 	const ms = new MarkdownString(
+	// 		`地址: [${apply.location.uri.fsPath.replace(/^.*src/, "")}#${
+	// 			apply.location.range.start.line + 1
+	// 		}](command:mathis.navigate?${encodeURIComponent(
+	// 			JSON.stringify(apply)
+	// 		)} "跳转链接")`,
+	// 		true
+	// 	);
 
-		ms.appendCodeblock(apply.code, apply.languageId);
-		ms.isTrusted = true;
-		return ms;
-	});
+	// 	ms.appendCodeblock(apply.code, apply.languageId);
+	// 	ms.isTrusted = true;
+	// 	return ms;
+	// });
 
-	return new Hover(str);
+	return new Hover("str");
 };

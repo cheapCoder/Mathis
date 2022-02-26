@@ -16,13 +16,19 @@ declare type ActiveFileType = "define" | "apply";
 
 declare type I18nLibType = "react-intl" | "svelte-i18n" | undefined;
 
-declare type LocaleMapType = {
-	[value: string]: { [lang: string]: import("./manger").DefNode };
+declare type DefMapType = {
+	[path: string]: Map<string, import("./parser/def").DefNode>;
 };
 
-declare type ApplyInfo = {
+declare type ApplyMapType =
+	| {
+			[path: string]: Map<string, ApplyParseNode[]>;
+	  }
+	| undefined;
+
+declare interface ApplyParseNode {
 	key: string;
-	location: import("vscode").Location;
+	loc: import("vscode").Location;
 	code: string;
 	languageId: string;
-};
+}

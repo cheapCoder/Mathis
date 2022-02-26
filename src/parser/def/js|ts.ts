@@ -1,8 +1,8 @@
 import { Parser } from "acorn";
 import { Range } from "vscode";
-import { DefNode } from "../../manger";
+import { DefNode } from ".";
 
-export default function tsParse(text: string, meta: AstMeta = {}): void {
+export default function tsParse(text: string, meta: AstMeta = {}): DefNode[] {
 	const ast = Parser.parse(text, {
 		ecmaVersion: "latest",
 		sourceType: "module",

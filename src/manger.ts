@@ -1,16 +1,16 @@
 import { ExtensionContext, Location, Range, Uri, window, workspace } from "vscode";
 import applyParser from "./parser/apply";
 import defParser from "./parser/def";
+import config from "./config";
+import path from "path";
 
 // TODO: 支持代码补全
 class Manger {
 	public i18nLib: I18nLibType;
 	public supportLang: Set<string> = new Set();
 	public context: ExtensionContext;
-	public defParser = defParser;
-	public applyParser = applyParser;
-	public keyMap: LocaleMapType = {};
-	public applyMap: { [key: string]: ApplyInfo[] } | undefined;
+	public defMap: DefMapType = {};
+	public applyMap: ApplyMapType = {};
 
 	private _activeFileType: ActiveFileType = "apply";
 	public get activeFileType() {
@@ -20,42 +20,63 @@ class Manger {
 		this._activeFileType = val;
 
 		// 懒加载到打开locale文件时再实例化
-		if (val === "define" && !this.applyMap) {
-			applyParser.init();
+		if (val === "define" && JSON.stringify(this.applyMap) === "{}") {
+			applyParser.parse(undefined, this.defMap).then((res) => {
+				this.applyMap = { ...this.applyMap, ...res };
+				setTimeout(() => {
+					console.log(this);
+				}, 5000);
+			});
 		}
 	}
 
 	constructor() {
-		this.init();
-
 		window.onDidChangeActiveTextEditor((e) => {
-			this.activeFileType = defParser.matchUris.find(
-				(u) => u.fsPath === e.document.fileName
-			)
+			if (!e) {
+				return;
+			}
+
+			this.activeFileType = config.defList.find((u) => u.fsPath === e.document.fileName)
 				? "define"
 				: "apply";
 
 			console.log(this);
+
+			// setTimeout(() => {
+			// 	Object.keys(this.applyMap).forEach((key) => {
+			// 		if (!this.keyMap[key]) {
+			// 			console.log(key);
+			// 		}
+			// 	});
+			// 	console.log("-----------");
+			// 	Object.keys(this.keyMap).forEach((key) => {
+			// 		if (!this.applyMap[key]) {
+			// 			console.log(key);
+			// 		}
+			// 	});
+			// 	console.log(Object.keys(this.applyMap).length);
+			// 	console.log(Object.keys(this.keyMap).length);
+			// }, 10000);
 		});
 	}
 
-	public async init() {
-		// 查找依赖库
-		try {
-			const path = (await workspace.findFiles("package.json"))[0].fsPath;
-			const packageJson = (await import(path))["default"];
+	public async init(context: ExtensionContext) {
+		this.context = context;
+		await config.init(context);
 
-			this.i18nLib = Object.keys(applyParser.libFormatRegMap).find(
-				(name) => packageJson["dependencies"][name]
-			) as I18nLibType;
-		} catch (e) {
-			window.showErrorMessage("未发现package.json文件或i18n库依赖");
-		}
+		const defRes = await defParser.parse(config.defList);
 
-		await defParser.init();
+		// set supportLang
+		config.defList.forEach((uri) => {
+			this.supportLang.add(path.parse(uri.fsPath).name);
+		});
 
-		this.activeFileType = defParser.matchUris.find(
-			(u) => u.fsPath === window.activeTextEditor.document.fileName
+		this.defMap = { ...this.defMap, ...defRes };
+
+		this.activeFileType = config.defList.find(
+			(u) =>
+				u.fsPath ===
+				(window.activeTextEditor || window.visibleTextEditors[0])?.document.fileName
 		)
 			? "define"
 			: "apply";
@@ -63,47 +84,27 @@ class Manger {
 		console.log(this);
 	}
 
-	public addDef(n: DefNode | DefNode[], lang: string) {
-		Array.isArray(n) || (n = [n]);
+	// public addDef(n: DefNode | DefNode[], lang: string) {
+	// 	Array.isArray(n) || (n = [n]);
 
-		n.forEach((node) => {
-			this.keyMap[node.key] ||= {};
-			this.keyMap[node.key][lang] = node;
-		});
+	// 	n.forEach((node) => {
+	// 		this.defMap[node.key] ||= {};
+	// 		this.defMap[node.key][lang] = node;
+	// 	});
 
-		this.supportLang.add(lang);
-	}
+	// 	this.supportLang.add(lang);
+	// }
 
-	public addApply(
-		key: string,
-		// uri: Uri,
-		// range: Range,
-		location: Location,
-		meta: { code: string; languageId: string }
-	) {
-		this.applyMap ||= {};
-		Array.isArray(this.applyMap[key]) || (this.applyMap[key] = []);
+	// public addApply(
+	// 	key: string,
+	// 	location: Location,
+	// 	meta: { code: string; languageId: string }
+	// ) {
+	// 	this.applyMap ||= {};
+	// 	Array.isArray(this.applyMap[key]) || (this.applyMap[key] = []);
 
-		this.applyMap[key].push({ location, key, ...meta });
-	}
+	// 	this.applyMap[key].push({ location, key, ...meta });
+	// }
 }
 
 export default new Manger();
-
-export class DefNode {
-	public constructor(
-		public key: string,
-		public value: string,
-		public keyRange: Range,
-		public valueRange: Range,
-		public lang: string,
-		public defUri: Uri
-	) {
-		this.key = key;
-		this.value = value;
-		this.lang = lang;
-		this.defUri = defUri;
-		this.keyRange = keyRange;
-		this.valueRange = valueRange;
-	}
-}

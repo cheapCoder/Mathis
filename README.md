@@ -1,6 +1,6 @@
-# mathis README
+# mathis
 
-This is the README for your extension "mathis". After writing up a brief description, we recommend including the following sections.
+a extension for making i18n looking convenient
 
 ## Features
 
@@ -82,3 +82,4 @@ Ensure that you've read through the extensions guidelines and follow the best pr
 ### 规范：
 
 - 所有位置存储 base-one
+- 设置 => 定义文件 => 应用文件

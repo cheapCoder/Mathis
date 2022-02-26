@@ -1,4 +1,5 @@
-import { commands, env, Selection, Uri, window } from "vscode";
+import { commands, env, Selection, window } from "vscode";
+import manger from "../manger";
 
 // 跳转定义文件
 export const disDefinition = commands.registerCommand("mathis.definition", (args) => {
@@ -54,3 +55,41 @@ export const disNav = commands.registerCommand("mathis.navigate", (args) => {
 		),
 	});
 });
+
+export const disSearch = commands.registerCommand(
+	"mathis.searchFromClipboard",
+	async () => {
+		const val = await env.clipboard.readText();
+
+		if (!val) {
+			window.showErrorMessage("未发现查找值");
+		}
+
+		if (manger.defMap[val]) {
+			// const matchWord = manger.keyMap[val];
+			// const markdownStrings = Object.keys(matchWord).map((lan) => {
+			// 	const ms = new MarkdownString(
+			// 		`${lan}: ${
+			// 			matchWord[lan].value
+			// 		} [$(keybindings-edit)](command:mathis.definition?${encodeURIComponent(
+			// 			JSON.stringify(matchWord[lan])
+			// 		)} "更改文案")  [$(explorer-view-icon)](command:mathis.copy?${encodeURIComponent(
+			// 			JSON.stringify({
+			// 				value: matchWord[lan].value,
+			// 			})
+			// 		)} "复制")`,
+			// 		true
+			// 	);
+
+			// 	ms.isTrusted = true;
+			// 	ms.supportHtml = true;
+
+			// 	return ms;
+			// });
+			// TODO:markdownStrings？
+			window.showInformationMessage(
+				`查找到key: ${val}\n值: ${JSON.stringify(manger.defMap[val])}`
+			);
+		}
+	}
+);

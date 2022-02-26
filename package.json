@@ -26,18 +26,26 @@
 				],
 				"extensions": [
 					".svelte"
-				],
-				"configuration": "./language-configuration.json"
+				]
+			}
+		],
+		"keybindings": [
+			{
+				"key": "cmd+v cmd+v",
+				"command": "mathis.searchFromClipboard"
 			}
 		],
 		"configuration": [
 			{
-				"title": "LocaleMatch",
+				"title": "mathis",
 				"properties": {
 					"defSelect": {
 						"title": "defSelect",
 						"description": "select the key or the value part",
-						"type":"array"
+						"type": "array"
+					},
+					"applyDelta": {
+						"type": "string"
 					}
 				}
 			}
@@ -52,6 +60,7 @@
 		"test": "node ./out/test/runTest.js"
 	},
 	"devDependencies": {
+		"@types/acorn": "^4.0.6",
 		"@types/json-to-ast": "^2.1.2",
 		"@types/mocha": "^9.0.0",
 		"@types/node": "14.x",

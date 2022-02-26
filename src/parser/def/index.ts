@@ -1,8 +1,25 @@
-import { Uri, workspace } from "vscode";
-
-import manger from "../../manger";
-import tsParse from "./js|ts";
+import path from "path";
+import { Range, Uri, workspace } from "vscode";
 import jsonParse from "./json";
+import tsParse from "./js|ts";
+
+export class DefNode {
+	public constructor(
+		public key: string,
+		public value: string,
+		public keyRange: Range,
+		public valueRange: Range,
+		public lang: string,
+		public defUri: Uri
+	) {
+		this.key = key;
+		this.value = value;
+		this.lang = lang;
+		this.defUri = defUri;
+		this.keyRange = keyRange;
+		this.valueRange = valueRange;
+	}
+}
 
 class Def {
 	private static parserMap = {
@@ -11,35 +28,27 @@ class Def {
 		ts: tsParse,
 	};
 
-	public isReady = false;
-
-	public matchUris: Uri[] = [];
-
-	public async init() {
-		// TODO:可配置
-		// ts,js,json格式的多语言文件
-		this.matchUris = await workspace.findFiles(
-			"**/locale/{en_US,zh_CN}.{ts,js,json}",
-			"**/node_modules/**"
+	public async parse(list: Uri[]) {
+		const res: DefMapType = {};
+		const contents = (await Promise.all(list.map((u) => workspace.fs.readFile(u)))).map(
+			(a) => a.toString()
 		);
 
-		await this.dispatchDefParse();
-		this.isReady = true;
-	}
+		contents.forEach(async (content, i) => {
+			const file = path.parse(list[i].fsPath);
 
-	public async dispatchDefParse() {
-		const arrs = (
-			await Promise.all(this.matchUris.map((u) => workspace.fs.readFile(u)))
-		).map((a) => a.toString());
+			const nodes: DefNode[] = Def.parserMap[file.ext.substring(1)](content, {
+				uri: list[i],
+				lang: file.name,
+			});
 
-		arrs.forEach(async (content, i) => {
-			const filename = this.matchUris[i].fsPath.split("/").pop().split(".");
-			const ext = filename.pop();
-			const lang = filename.join(".");
-
-			const nodes = Def.parserMap[ext](content, { uri: this.matchUris[i], lang });
-			manger.addDef(nodes, lang);
+			const map = new Map();
+			nodes.forEach((n) => {
+				map.set(n.key, n);
+			});
+			res[list[i].fsPath] = map;
 		});
+		return res;
 	}
 }
 
