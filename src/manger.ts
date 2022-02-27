@@ -78,7 +78,7 @@ class Manger {
 		// init apply node
 		await this.updateApply();
 
-		console.log(this);
+		// console.log(this);
 		console.timeEnd("mathis");
 	}
 
@@ -133,10 +133,6 @@ class Manger {
 				new Set(nodeList.map((node) => node.key))
 			);
 		});
-
-		// Array.isArray(this.applyMap[key]) || (this.applyMap[key] = []);
-
-		// this.applyMap[key].push({ location, key, ...meta });
 	}
 }
 

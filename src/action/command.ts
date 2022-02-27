@@ -7,7 +7,6 @@ export const disDefinition = commands.registerCommand("mathis.definition", (args
 		defUri,
 		valueRange: [start, end],
 	} = args;
-	console.log(args);
 
 	window.showTextDocument(defUri, {
 		// Selection参数都是zero-based
@@ -36,7 +35,6 @@ export const disCopy = commands.registerCommand(
 
 // 跳转文件
 export const disNav = commands.registerCommand("mathis.navigate", (args) => {
-	console.log(args);
 
 	if (!args) {
 		window.showInformationMessage("缺失参数");

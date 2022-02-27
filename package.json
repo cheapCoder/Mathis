@@ -3,7 +3,7 @@
 	"publisher": "happyHacking",
 	"displayName": "mathis",
 	"description": "show what match your configure in your project",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"repository": "https://github.com/necessityOVO/mathis",
 	"engines": {
 		"vscode": "^1.62.0"
