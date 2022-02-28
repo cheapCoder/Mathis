@@ -93,7 +93,7 @@ class Def {
 
 					return {
 						key: n["key"]["value"] || n["key"]["name"], // key无引号包含时，无value属性而是name属性
-						value: n["value"]["value"],
+						value: n["value"]["value"], // NOTE: 模板字符串是为undefined
 						keyRange: keyRange,
 						valueRange: valueRange,
 						defUri: uri,

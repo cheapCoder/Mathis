@@ -1,10 +1,10 @@
+import { ExtensionContext, TextDocument, Uri, window, workspace } from "vscode";
+import throttle from "lodash/throttle";
 import path from "path";
-import { ExtensionContext, Uri, window } from "vscode";
 import config from "./config";
 import applyParser from "./parser/apply";
 import defParser from "./parser/def";
 
-// TODO: 支持代码补全
 class Manger {
 	public i18nLib: I18nLibType;
 	public supportLang: Set<string> = new Set();
@@ -12,7 +12,7 @@ class Manger {
 	public defMap: DefMapType = new Map();
 	public defFileBuckets = new Map<string, Array<string>>();
 	public applyMap: ApplyMapType = new Map();
-	public applyFileBuckets = new Map<string, Set<string>>();
+	public applyFileBuckets = new Map<string, Array<string>>();
 
 	private _activeFileType: ActiveFileType = "apply";
 	public get activeFileType() {
@@ -22,14 +22,9 @@ class Manger {
 		this._activeFileType = val;
 
 		// 懒加载到打开locale文件时再实例化
-		// if (val === "define" && JSON.stringify(this.applyMap) === "{}") {
-		// applyParser.parse(undefined, this.defMap).then((res) => {
-		// this.applyMap = { ...this.applyMap, ...res };
-		// setTimeout(() => {
-		// 	console.log(this);
-		// }, 5000);
-		// });
-		// }
+		if (val === "define" && this.applyMap.size === 0) {
+			this.updateApply();
+		}
 	}
 
 	constructor() {
@@ -37,37 +32,26 @@ class Manger {
 			if (!e) {
 				return;
 			}
-
-			this.activeFileType = config.defList.find((u) => u.fsPath === e.document.fileName)
-				? "define"
-				: "apply";
-
-			// setTimeout(() => {
-			// 	Object.keys(this.applyMap).forEach((key) => {
-			// 		if (!this.keyMap[key]) {
-			// 			console.log(key);
-			// 		}
-			// 	});
-			// 	console.log("-----------");
-			// 	Object.keys(this.keyMap).forEach((key) => {
-			// 		if (!this.applyMap[key]) {
-			// 			console.log(key);
-			// 		}
-			// 	});
-			// 	console.log(Object.keys(this.applyMap).length);
-			// 	console.log(Object.keys(this.keyMap).length);
-			// }, 10000);
+			this.activeFileType = config.defList.find((u) => u.fsPath === e.document.fileName) ? "define" : "apply";
 		});
+
+		workspace.onDidSaveTextDocument(
+			throttle(
+				(e: TextDocument) => {
+					this.activeFileType === "define" ? this.updateDef([e.uri]) : this.updateApply([e.uri]);
+				},
+				2000,
+				{ leading: false, trailing: true }
+			)
+		);
 	}
 
 	public async init(context: ExtensionContext) {
 		this.context = context;
-		await config.init(context);
+		await config.init();
 
 		this.activeFileType = config.defList.find(
-			(u) =>
-				u.fsPath ===
-				(window.activeTextEditor || window.visibleTextEditors[0])?.document.fileName
+			(u) => u.fsPath === (window.activeTextEditor || window.visibleTextEditors[0])?.document.fileName
 		)
 			? "define"
 			: "apply";
@@ -75,11 +59,12 @@ class Manger {
 		// init def node
 		await this.updateDef();
 
-		// init apply node
-		await this.updateApply();
+		if (!config.lazyLoadApply) {
+			// init apply node
+			await this.updateApply();
+		}
 
 		// console.log(this);
-		console.timeEnd("mathis");
 	}
 
 	private async updateDef(list: Uri[] = config.defList) {
@@ -114,11 +99,10 @@ class Manger {
 			this.applyFileBuckets.get(list[i].fsPath)?.forEach((key) => {
 				this.applyMap.set(
 					key,
-					(this.applyMap.get(key) || []).filter(
-						(n) => n.loc.uri.fsPath !== list[i].fsPath
-					)
+					(this.applyMap.get(key) || []).filter((n) => n.loc.uri.fsPath !== list[i].fsPath)
 				);
 			});
+
 			nodeList.forEach((node) => {
 				if (!this.applyMap.has(node.key)) {
 					this.applyMap.set(node.key, []);
@@ -126,11 +110,10 @@ class Manger {
 				this.applyMap.get(node.key)?.push(node);
 			});
 
-			// FIXME:记录不对
 			// 更新记录filepath-key的桶
 			this.applyFileBuckets.set(
 				list[i].fsPath,
-				new Set(nodeList.map((node) => node.key))
+				nodeList.map((node) => node.key)
 			);
 		});
 	}

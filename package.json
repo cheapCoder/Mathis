@@ -1,10 +1,12 @@
 {
 	"name": "mathis",
 	"publisher": "happyHacking",
-	"displayName": "mathis",
-	"description": "show what match your configure in your project",
-	"version": "0.1.1",
+	"displayName": "Mathis",
+	"description": "一个辅助国际化显示的轻量插件",
+	"version": "0.2.0",
 	"repository": "https://github.com/necessityOVO/mathis",
+	"icon": "logo.png",
+	"main": "./out/src/extension.js",
 	"engines": {
 		"vscode": "^1.62.0"
 	},
@@ -14,7 +16,6 @@
 	"activationEvents": [
 		"workspaceContains:**/locale/**/*.{js,ts,jsx,tsx,json}"
 	],
-	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [],
 		"languages": [
@@ -37,20 +38,28 @@
 		],
 		"configuration": [
 			{
-				"title": "mathis",
+				"title": "Mathis",
 				"properties": {
-					"defSelect": {
-						"title": "defSelect",
-						"description": "select the key or the value part",
-						"type": "array"
-					},
-					"applyRange": {
-						"type": "string",
-						"description": "def文件显示应用的代码块显示的范围"
-					},
-					"pathSlice": {
+					"mathis.lazyLoadApply": {
+						"title": "lazyLoadApply",
+						"description": "是否直到进入国际化定义文件才加载字段应用列表",
 						"type": "boolean",
-						"default": "true",
+						"default": true
+					},
+					"mathis.defSelect": {
+						"title": "defSelect",
+						"description": "跳转定义文件时选择字段的哪些部分",
+						"type": "string",
+						"default": "value",
+						"enum": [
+							"key",
+							"value",
+							"key and value"
+						]
+					},
+					"mathis.pathSlice": {
+						"type": "boolean",
+						"default": true,
 						"description": "显示路径时去除src之前的部分"
 					}
 				}
@@ -69,6 +78,7 @@
 		"@types/acorn": "^4.0.6",
 		"@types/glob": "^7.2.0",
 		"@types/json-to-ast": "^2.1.2",
+		"@types/lodash": "^4.14.179",
 		"@types/mocha": "^9.0.0",
 		"@types/node": "14.x",
 		"@types/vscode": "^1.62.0",
@@ -82,6 +92,7 @@
 	"dependencies": {
 		"@babel/types": "^7.16.0",
 		"acorn": "^8.7.0",
-		"json-to-ast": "^2.1.0"
+		"json-to-ast": "^2.1.0",
+		"lodash": "^4.17.21"
 	}
 }

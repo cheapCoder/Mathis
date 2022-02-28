@@ -48,9 +48,7 @@ class ApplyParser {
 		const res: ApplyNode[] = [];
 
 		for (let line = 1; line <= document.lineCount; line++) {
-			const lineWord = config.splitLetters.flatMap((s) =>
-				document.lineAt(line - 1).text.split(s)
-			);
+			const lineWord = config.splitLetters.flatMap((s) => document.lineAt(line - 1).text.split(s));
 
 			let column = 1;
 			// 保证顺序遍历

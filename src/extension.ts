@@ -6,10 +6,8 @@ import manger from "./manger";
 import config from "./config";
 
 export function activate(context: ExtensionContext) {
-	console.time("mathis");
-
 	manger.init(context);
-
+	
 	languages.registerHoverProvider(config.activeFileLanguage, dispatchHover());
 
 	// StatusBarItem

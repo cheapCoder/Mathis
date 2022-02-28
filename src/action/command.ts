@@ -1,12 +1,13 @@
 import { commands, env, Selection, window } from "vscode";
+import config from "../config";
 import manger from "../manger";
 
 // 跳转定义文件
-export const disDefinition = commands.registerCommand("mathis.definition", (args) => {
-	const {
-		defUri,
-		valueRange: [start, end],
-	} = args;
+export const disDefinition = commands.registerCommand("mathis.navigateToDef", (args) => {
+	const { defUri, valueRange, keyRange } = args;
+
+	const start = "value" === config.defSelect ? valueRange[0] : keyRange[0];
+	const end = "key" === config.defSelect ? keyRange[1] : valueRange[1];
 
 	window.showTextDocument(defUri, {
 		// Selection参数都是zero-based
@@ -20,22 +21,18 @@ export const disDefinition = commands.registerCommand("mathis.definition", (args
 });
 
 // 复制
-export const disCopy = commands.registerCommand(
-	"mathis.copy",
-	({ value }: { value: string }) => {
-		if (!value) {
-			window.showInformationMessage("未找到值...");
-			return;
-		}
-		env.clipboard.writeText(value).then(() => {
-			window.showInformationMessage(`“${value}”  复制成功`);
-		});
+export const disCopy = commands.registerCommand("mathis.copy", ({ value }: { value: string }) => {
+	if (!value) {
+		window.showInformationMessage("未找到值...");
+		return;
 	}
-);
+	env.clipboard.writeText(value).then(() => {
+		window.showInformationMessage(`“${value}”  复制成功`);
+	});
+});
 
-// 跳转文件
-export const disNav = commands.registerCommand("mathis.navigate", (args) => {
-
+// 跳转应用文件
+export const disNav = commands.registerCommand("mathis.navigateToApply", (args) => {
 	if (!args) {
 		window.showInformationMessage("缺失参数");
 		return;
@@ -52,40 +49,45 @@ export const disNav = commands.registerCommand("mathis.navigate", (args) => {
 	});
 });
 
-export const disSearch = commands.registerCommand(
-	"mathis.searchFromClipboard",
-	async () => {
-		const val = await env.clipboard.readText();
+// 从剪切板中的值查找
+export const disSearch = commands.registerCommand("mathis.searchFromClipboard", async () => {
+	const val = await env.clipboard.readText();
 
-		if (!val) {
-			window.showErrorMessage("未发现查找值");
-		}
-
-		if (manger.defMap.get(val)) {
-			// const matchWord = manger.keyMap[val];
-			// const markdownStrings = Object.keys(matchWord).map((lan) => {
-			// 	const ms = new MarkdownString(
-			// 		`${lan}: ${
-			// 			matchWord[lan].value
-			// 		} [$(keybindings-edit)](command:mathis.definition?${encodeURIComponent(
-			// 			JSON.stringify(matchWord[lan])
-			// 		)} "更改文案")  [$(explorer-view-icon)](command:mathis.copy?${encodeURIComponent(
-			// 			JSON.stringify({
-			// 				value: matchWord[lan].value,
-			// 			})
-			// 		)} "复制")`,
-			// 		true
-			// 	);
-
-			// 	ms.isTrusted = true;
-			// 	ms.supportHtml = true;
-
-			// 	return ms;
-			// });
-			// TODO:markdownStrings？
-			window.showInformationMessage(
-				`查找到key: ${val}\n值: ${JSON.stringify(manger.defMap.get(val))}`
-			);
-		}
+	if (!val) {
+		window.showErrorMessage("剪切板未发现值");
 	}
-);
+
+	let res: DefNode[] = [];
+	if (manger.defMap.has(val)) {
+		//@ts-ignore
+		res = Array.from(manger.defMap.get(val)).map((entries) => entries[1]);
+	} else {
+		manger.defMap.forEach((langMap) => {
+			langMap.forEach((node) => {
+				if (node.value?.includes(val)) {
+					res.push(node);
+				}
+			});
+		});
+	}
+	if (res.length === 0) {
+		window.showInformationMessage(`未查找'${val}'到关联节点`);
+	}
+	const msg = res.reduce((str, cur) => `${str}${cur.key}: ${cur.value}\n${cur.defUri.fsPath}\n`, "");
+	window.showInformationMessage(`查找${val}:\n${msg}`);
+});
+
+// 过滤出语言定义有缺的字段
+// 	Object.keys(this.applyMap).forEach((key) => {
+// 		if (!this.keyMap[key]) {
+// 			console.log(key);
+// 		}
+// 	});
+// 	console.log("-----------");
+// 	Object.keys(this.keyMap).forEach((key) => {
+// 		if (!this.applyMap[key]) {
+// 			console.log(key);
+// 		}
+// 	});
+// 	console.log(Object.keys(this.applyMap).length);
+// 	console.log(Object.keys(this.keyMap).length);

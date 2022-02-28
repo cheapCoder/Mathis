@@ -1,4 +1,5 @@
-import { ExtensionContext, Uri, window, workspace } from "vscode";
+import { Uri, window, workspace } from "vscode";
+import packageJson from "../package.json";
 
 interface LibFormatRegMap {
 	"react-intl": RegExp[];
@@ -6,7 +7,7 @@ interface LibFormatRegMap {
 }
 
 class Config {
-	public projectName = "";
+	public projectName = packageJson.name;
 	public splitLetters = ["'", '"', "`"];
 	public activeFileLanguage = [
 		"javascript",
@@ -19,44 +20,44 @@ class Config {
 	];
 	public i18nLib: keyof LibFormatRegMap | undefined;
 	public libFormatRegMap: LibFormatRegMap = {
-		"react-intl": [
-			/(?<=((props\.)?intl\.)?formatMessage\(\s*{\s*id:\s+['"])([a-zA-Z\._]+)(?=['"])/,
-		],
+		// TODO:优化正则匹配
+		"react-intl": [/(?<=((props\.)?intl\.)?formatMessage\(\s*{\s*id:\s+['"])([a-zA-Z\._]+)(?=['"])/],
 		"svelte-i18n": [/(?<=\$_\(['"])[\w\d_-]+(?=['"].*?\))/],
 	};
 
 	public applyList: Uri[] = [];
 	public defList: Uri[] = [];
 
-	async init(context: ExtensionContext) {
-		this.projectName = context.extension.packageJSON.name;
+	public applyRange = 0;
+	public lazyLoadApply = true;
+	public pathSlice = true;
+	public defSelect = "value";
 
-		const conf = workspace.getConfiguration(this.projectName);
-		// console.log(conf.get("defSelect"));
-
-		// mergeConfig()
+	async init() {
+		this.mergeConfig();
 
 		await Promise.all([this.distinguishFiles(), this.findI18nLib()]);
+	}
+
+	private async mergeConfig() {
+		const conf = workspace.getConfiguration(this.projectName);
+
+		this.lazyLoadApply = conf.lazyLoadApply;
+		this.pathSlice = conf.pathSlice;
+		this.applyRange = conf.applyRange;
+		this.defSelect = conf.defSelect;
 	}
 
 	private async distinguishFiles() {
 		// 查找定义文件
 		// TODO:可配置
 		// ts,js,json格式的多语言文件
-		this.defList = await workspace.findFiles(
-			"**/locale/{en_US,zh_CN}.{ts,js,json}",
-			"**/node_modules/**"
-		);
+		this.defList = await workspace.findFiles("**/locale/{en_US,zh_CN}.{ts,js,json}", "**/node_modules/**");
 
 		// 查找应用文件
-		this.applyList = await workspace.findFiles(
-			"**/*.{ts,js,tsx,jsx,svelte,vue}",
-			"**/node_modules/**"
-		);
+		this.applyList = await workspace.findFiles("**/*.{ts,js,tsx,jsx,svelte,vue}", "**/node_modules/**");
 		// 过滤匹配的locale定义文件
-		this.applyList = this.applyList.filter(
-			(al) => !this.defList.find((dl) => dl.fsPath === al.fsPath)
-		);
+		this.applyList = this.applyList.filter((al) => !this.defList.find((dl) => dl.fsPath === al.fsPath));
 	}
 
 	private async findI18nLib() {

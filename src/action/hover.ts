@@ -1,11 +1,4 @@
-import {
-	CancellationToken,
-	Hover,
-	MarkdownString,
-	Position,
-	TextDocument,
-	window,
-} from "vscode";
+import { CancellationToken, Hover, MarkdownString, Position, TextDocument, window } from "vscode";
 import path from "path";
 import config from "../config";
 import manger from "../manger";
@@ -34,9 +27,7 @@ const showDefHover = (document: TextDocument, position: Position) => {
 	const markdownStrings: MarkdownString[] = [];
 	defList.forEach((node) => {
 		const ms = new MarkdownString(
-			`${node.lang}: ${
-				node.value
-			} [$(keybindings-edit)](command:mathis.definition?${encodeURIComponent(
+			`${node.lang}: ${node.value} [$(keybindings-edit)](command:mathis.navigateToDef?${encodeURIComponent(
 				JSON.stringify(node)
 			)} "更改文案")  [$(explorer-view-icon)](command:mathis.copy?${encodeURIComponent(
 				JSON.stringify({ value: node.value })
@@ -69,10 +60,8 @@ const showApplyHover = (document: TextDocument, position: Position) => {
 		// TODO: 实现一个lru队列存储文件地址，优先查找最近使用的def文件，优化读取，获取前一个找到的文件，优先从此文件读取
 		const node = manger.defMap.get(key)?.get(document.uri.fsPath);
 		return (
-			(node?.keyRange.start.isBeforeOrEqual(position) &&
-				node?.keyRange.end.isAfterOrEqual(position)) ||
-			(node?.valueRange.start.isBeforeOrEqual(position) &&
-				node?.valueRange.end.isAfterOrEqual(position))
+			(node?.keyRange.start.isBeforeOrEqual(position) && node?.keyRange.end.isAfterOrEqual(position)) ||
+			(node?.valueRange.start.isBeforeOrEqual(position) && node?.valueRange.end.isAfterOrEqual(position))
 		);
 	});
 
@@ -82,10 +71,9 @@ const showApplyHover = (document: TextDocument, position: Position) => {
 
 	return new Hover(
 		(manger.applyMap.get(key) || []).map((apply) => {
+			const path = config.pathSlice ? apply.loc.uri.fsPath.replace(/^.*src/, "") : apply.loc.uri.fsPath;
 			const ms = new MarkdownString(
-				`地址: [${apply.loc.uri.fsPath.replace(/^.*src/, "")}#${
-					apply.loc.range.start.line + 1
-				}](command:mathis.navigate?${encodeURIComponent(
+				`地址: [${path}#${apply.loc.range.start.line}](command:mathis.navigateToApply?${encodeURIComponent(
 					JSON.stringify(apply)
 				)} "跳转链接")`,
 				true
