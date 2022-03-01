@@ -3,9 +3,9 @@
 	"publisher": "happyHacking",
 	"displayName": "Mathis",
 	"description": "一个辅助国际化显示的轻量插件",
-	"version": "0.2.1",
+	"version": "0.2.2",
 	"repository": "https://github.com/necessityOVO/mathis",
-	"icon": "logo.png",
+	"icon": "img/logo.png",
 	"main": "./out/src/extension.js",
 	"engines": {
 		"vscode": "^1.62.0"
@@ -41,13 +41,23 @@
 				"title": "Mathis",
 				"properties": {
 					"mathis.lazyLoadApply": {
-						"title": "lazyLoadApply",
+						"order": 0,
 						"description": "是否直到进入国际化定义文件才加载字段应用列表",
 						"type": "boolean",
 						"default": true
 					},
+					"mathis.detectApplyWay": {
+						"order": 1,
+						"description": "检测应用节点的方式\nreg:正则匹配; split:分词在def中查找(检测更完备)",
+						"type": "string",
+						"default": "split",
+						"enum": [
+							"reg",
+							"split"
+						]
+					},
 					"mathis.defSelect": {
-						"title": "defSelect",
+						"order": 2,
 						"description": "跳转定义文件时选择字段的哪些部分",
 						"type": "string",
 						"default": "value",
@@ -58,6 +68,7 @@
 						]
 					},
 					"mathis.pathSlice": {
+						"order": 3,
 						"type": "boolean",
 						"default": true,
 						"description": "显示路径时去除src之前的部分"

@@ -7,4 +7,3 @@ export const copyItem = () => {
 	statusBar.text = "查找";
 	statusBar.show();
 };
-

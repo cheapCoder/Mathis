@@ -2,12 +2,10 @@ import { Location, Range, Uri, window, workspace } from "vscode";
 import config from "../config";
 
 class ApplyParser {
-	public async parse(uri: Uri, defMap?: DefMapType) {
-		// 法一
-		return this.getApplyOfFileByReg(uri);
-
-		// 法二
-		//return this.getApplyOfFileBySplit(uri, defMap);
+	public async parse(uri: Uri, defMap: DefMapType) {
+		return config.detectApplyWay === "reg"
+			? this.getApplyOfFileByReg(uri)
+			: this.getApplyOfFileBySplit(uri, defMap);
 	}
 
 	// 检测方式1-正则表达式
@@ -42,7 +40,7 @@ class ApplyParser {
 	private async getApplyOfFileBySplit(uri: Uri, defMap: DefMapType) {
 		if (!defMap) {
 			window.showErrorMessage("国际化定义文件未加载!");
-			return;
+			return [];
 		}
 		const document = await workspace.openTextDocument(uri);
 		const res: ApplyNode[] = [];

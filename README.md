@@ -1,86 +1,60 @@
 # mathis
 
-a extension for making i18n looking convenient
+一个辅助国际化显示的 vscode 小插件
+
+![](https://github.com/cheapCoder/mathis/blob/develop/img/intro.gif?raw=true)
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
-
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
-
-## Requirements
-
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+- [x] 从应用点 hover 显示定义位置及多语言值
+- [x] 从定义位置 hover 显示应用列表及应用行文本
+- [x] 支持复制值
+- [x] 快捷键(cmd+shift+v)或左下角的查找按钮查找值
+- [ ] 支持用户设置locale路径
+- [ ] 支持检测未使用或定义不完全的字段
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+```jsonc
+"mathis.lazyLoadApply": {
+	"description": "是否直到进入国际化定义文件才加载字段应用列表",
+	"type": "boolean",
+	"default": true
+},
+"mathis.pathSlice": {
+	"description": "显示路径时去除src之前的部分",
+	"type": "boolean",
+	"default": true,
+}
+"mathis.detectApplyWay": {
+	"description": "检测应用节点的方式",
+	"type": "string",
+	"default": "split",
+	"enum": [
+		"reg",  // 通过i18n format函数正则匹配
+		"split" // 将文本使用分号分词，逐个在定义列表中查找的方式确定是否为i18n key
+	]
+},
+"mathis.defSelect": {
+	"description": "跳转定义文件时选择字段的哪些部分",
+	"type": "string",
+	"default": "value",
+	"enum": [
+		"key",
+		"value",
+		"key and value"
+	]
+},
+```
 
-For example:
+## Something Else
 
-This extension contributes the following settings:
+- 为了简单直接，插件只监听文件的保存(节流1s)，不监听文件删除，重命名等行为
 
-- `myExtension.enable`: enable/disable this extension
-- `myExtension.thing`: set to `blah` to do something
+- 使用定义文件的文件名作为语言显示
 
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-- [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-- Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-- Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-- Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-- [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-- [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
-
-### i18n-ally 不支持
-
-- i18n 库的 format 函数内使用三元判断 id 时无法检测到
-- 无 locale 源文件映射到应用文件
+- 所有位置存储 base-one
 
 ### 工具：
 
 - [ast explorer](https://astexplorer.net/)
-
-### 规范：
-
-- 所有位置存储 base-one
-<!-- - 设置 => 定义文件 => 应用文件 -->
-- 使用定义文件的文件名作为语言

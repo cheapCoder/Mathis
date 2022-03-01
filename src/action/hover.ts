@@ -56,7 +56,6 @@ const showApplyHover = (document: TextDocument, position: Position) => {
 	}
 
 	const key = manger.defFileBuckets.get(document.uri.fsPath)?.find((key) => {
-		// TODO: 实现一个lru队列存储文件地址，优先查找最近使用的def文件，优化读取，获取前一个找到的文件，优先从此文件读取
 		const node = manger.defMap.get(key)?.get(document.uri.fsPath);
 		return (
 			(node?.keyRange.start.isBeforeOrEqual(position) && node?.keyRange.end.isAfterOrEqual(position)) ||

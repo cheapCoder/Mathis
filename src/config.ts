@@ -28,27 +28,29 @@ class Config {
 	public applyList: Uri[] = [];
 	public defList: Uri[] = [];
 
-	public applyRange = 0;
 	public lazyLoadApply = true;
+	public detectApplyWay = "split";
 	public pathSlice = true;
 	public defSelect = "value";
 
 	constructor() {
+		this.mergeConfig();
+
 		workspace.onDidChangeConfiguration(this.mergeConfig.bind(this));
 	}
 
 	async init() {
-		this.mergeConfig();
-
 		await Promise.all([this.distinguishFiles(), this.findI18nLib()]);
+
+		console.log(this);
 	}
 
-	private async mergeConfig() {
+	private mergeConfig() {
 		const conf = workspace.getConfiguration(this.projectName);
 
 		this.lazyLoadApply = conf.lazyLoadApply;
+		this.detectApplyWay = conf.detectApplyWay;
 		this.pathSlice = conf.pathSlice;
-		this.applyRange = conf.applyRange;
 		this.defSelect = conf.defSelect;
 	}
 
