@@ -33,6 +33,10 @@ class Config {
 	public pathSlice = true;
 	public defSelect = "value";
 
+	constructor() {
+		workspace.onDidChangeConfiguration(this.mergeConfig.bind(this));
+	}
+
 	async init() {
 		this.mergeConfig();
 

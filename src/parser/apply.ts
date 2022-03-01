@@ -54,7 +54,6 @@ class ApplyParser {
 			// 保证顺序遍历
 			for (let i = 0; i < lineWord.length; i++) {
 				if (defMap.get(lineWord[i])) {
-					// TODO:整理所有的偏移计算,这里line为什么要+1而不是-1
 					const range = new Range(line, column, line, column + lineWord[i].length - 1);
 
 					res.push({

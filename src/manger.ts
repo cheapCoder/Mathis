@@ -40,7 +40,7 @@ class Manger {
 				(e: TextDocument) => {
 					this.activeFileType === "define" ? this.updateDef([e.uri]) : this.updateApply([e.uri]);
 				},
-				2000,
+				1000,
 				{ leading: false, trailing: true }
 			)
 		);
@@ -63,8 +63,6 @@ class Manger {
 			// init apply node
 			await this.updateApply();
 		}
-
-		// console.log(this);
 	}
 
 	private async updateDef(list: Uri[] = config.defList) {
@@ -72,6 +70,10 @@ class Manger {
 		const res = await Promise.all(list.map((u) => defParser.parse(u)));
 
 		res.forEach((nodeList, i) => {
+			this.defFileBuckets.get(list[i].fsPath)?.forEach((key) => {
+				this.defMap.get(key)?.delete(list[i].fsPath);
+			});
+
 			// 更新记录filepath-key的桶
 			this.defFileBuckets.set(
 				list[i].fsPath,

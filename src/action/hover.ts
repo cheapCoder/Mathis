@@ -45,7 +45,6 @@ const showDefHover = (document: TextDocument, position: Position) => {
 };
 
 const showApplyHover = (document: TextDocument, position: Position) => {
-	// TODO: 提供可关闭hover显示的配置
 	position = position.translate(1, 1);
 
 	// 获取语言
