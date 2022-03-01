@@ -2,6 +2,9 @@
 
 a extension for making i18n looking convenient
 
+
+
+![](https://github.com/cheapCoder/mathis/blob/img/intro.gif?raw=true)
 ## Features
 
 Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.

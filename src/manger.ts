@@ -92,7 +92,7 @@ class Manger {
 	}
 
 	private async updateApply(list: Uri[] = config.applyList) {
-		const res = await Promise.all(list.map((uri) => applyParser.parse(uri)));
+		const res = await Promise.all(list.map((uri) => applyParser.parse(uri, this.defMap)));
 
 		// TODO:优化
 		res.forEach((nodeList, i) => {
