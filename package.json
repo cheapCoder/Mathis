@@ -48,7 +48,7 @@
 					},
 					"mathis.detectApplyWay": {
 						"order": 1,
-						"description": "检测应用节点的方式\nreg:正则匹配; split:分词在def中查找(检测更完备)",
+						"description": "检测应用节点的方式\nreg:正则匹配(会有缺失)); split:分词在def中查找(会有多余)",
 						"type": "string",
 						"default": "split",
 						"enum": [
@@ -67,11 +67,17 @@
 							"key and value"
 						]
 					},
-					"mathis.pathSlice": {
+					"mathis.pathSlice.enabled": {
 						"order": 3,
 						"type": "boolean",
 						"default": true,
 						"description": "显示路径时去除src之前的部分"
+					},
+					"mathis.statusBar.enabled": {
+						"order": 4,
+						"type": "boolean",
+						"default": true,
+						"description": "在左下方显示查找按钮，行为与cmd+shift+v相同"
 					}
 				}
 			}

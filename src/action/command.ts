@@ -71,9 +71,13 @@ export const disSearch = commands.registerCommand("mathis.searchFromClipboard", 
 		});
 	}
 	if (res.length === 0) {
-		window.showInformationMessage(`未查找'${val}'到关联节点`);
+		window.showInformationMessage(`未查找到'${val}'`);
+		return;
 	}
-	const msg = res.reduce((str, cur) => `${str}${cur.key}: ${cur.value}\n${cur.defUri.fsPath}\n`, "");
+	const msg = res.reduce(
+		(str, cur) => `${str}${cur.key}: ${cur.value} || [前往](${cur.defUri.fsPath}) \n`,
+		""
+	);
 	window.showInformationMessage(`查找${val}:\n${msg}`);
 });
 

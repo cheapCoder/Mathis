@@ -35,14 +35,11 @@ class Config {
 
 	constructor() {
 		this.mergeConfig();
-
 		workspace.onDidChangeConfiguration(this.mergeConfig.bind(this));
 	}
 
 	async init() {
 		await Promise.all([this.distinguishFiles(), this.findI18nLib()]);
-
-		console.log(this);
 	}
 
 	private mergeConfig() {
@@ -58,10 +55,16 @@ class Config {
 		// 查找定义文件
 		// TODO:可配置
 		// ts,js,json格式的多语言文件
-		this.defList = await workspace.findFiles("**/locale/{en_US,zh_CN}.{ts,js,json}", "**/node_modules/**");
+		this.defList = await workspace.findFiles(
+			"src/**/locale/{en_US,zh_CN}.{ts,js,json}",
+			"**/{node_modules,dist,out}/**"
+		);
 
 		// 查找应用文件
-		this.applyList = await workspace.findFiles("**/*.{ts,js,tsx,jsx,svelte,vue}", "**/node_modules/**");
+		this.applyList = await workspace.findFiles(
+			"src/**/*.{ts,js,tsx,jsx,svelte,vue}",
+			"**/{node_modules,dist,out}/**"
+		);
 		// 过滤匹配的locale定义文件
 		this.applyList = this.applyList.filter((al) => !this.defList.find((dl) => dl.fsPath === al.fsPath));
 	}

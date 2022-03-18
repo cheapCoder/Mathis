@@ -7,7 +7,6 @@ import config from "./config";
 
 export function activate(context: ExtensionContext) {
 	manger.init(context);
-	
 	languages.registerHoverProvider(config.activeFileLanguage, dispatchHover());
 
 	// StatusBarItem
