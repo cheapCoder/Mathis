@@ -32,6 +32,18 @@ class Config {
 	public detectApplyWay = "split";
 	public pathSlice = true;
 	public defSelect = "value";
+	public defIncludeGlob = "";
+	public defExcludeGlob = "";
+	public applyIncludeGlob = "";
+	public applyExcludeGlob = "";
+
+	// for主题升级
+	public themeUpdateLink = "";
+	public themeUpdateIncludeGlob = "";
+	public themeUpdateExcludeGlob = "";
+	public themeUpdateIgnoreColors = [];
+
+	[key: string]: any;
 
 	constructor() {
 		this.mergeConfig();
@@ -45,26 +57,20 @@ class Config {
 	private mergeConfig() {
 		const conf = workspace.getConfiguration(this.projectName);
 
-		this.lazyLoadApply = conf.lazyLoadApply;
-		this.detectApplyWay = conf.detectApplyWay;
-		this.pathSlice = conf.pathSlice;
-		this.defSelect = conf.defSelect;
+		Object.keys(this).forEach((key) => {
+			if (conf[key] && !(this[key] instanceof Function)) {
+				this[key] = conf[key];
+			}
+		});
 	}
 
 	private async distinguishFiles() {
 		// 查找定义文件
-		// TODO:可配置
 		// ts,js,json格式的多语言文件
-		this.defList = await workspace.findFiles(
-			"src/**/locale/{en_US,zh_CN}.{ts,js,json}",
-			"**/{node_modules,dist,out}/**"
-		);
+		this.defList = await workspace.findFiles(this.defIncludeGlob, this.defExcludeGlob);
 
 		// 查找应用文件
-		this.applyList = await workspace.findFiles(
-			"src/**/*.{ts,js,tsx,jsx,svelte,vue}",
-			"**/{node_modules,dist,out}/**"
-		);
+		this.applyList = await workspace.findFiles(this.applyIncludeGlob, this.applyExcludeGlob);
 		// 过滤匹配的locale定义文件
 		this.applyList = this.applyList.filter((al) => !this.defList.find((dl) => dl.fsPath === al.fsPath));
 	}

@@ -1,13 +1,18 @@
-import { commands, env, Selection, window } from "vscode";
+import { commands, env, Range, Selection, window } from "vscode";
 import config from "../config";
 import manger from "../manger";
 
 // 跳转定义文件
 export const disDefinition = commands.registerCommand("mathis.navigateToDef", (args) => {
-	const { defUri, valueRange, keyRange } = args;
+	let { defUri, valueRange, keyRange } = args;
 
-	const start = "value" === config.defSelect ? valueRange[0] : keyRange[0];
-	const end = "key" === config.defSelect ? keyRange[1] : valueRange[1];
+	if (!valueRange.start) {
+		valueRange = new Range(valueRange[0], valueRange[1]);
+		keyRange = new Range(keyRange[0], keyRange[1]);
+	}
+
+	const start = "value" === config.defSelect ? valueRange.start : keyRange.start;
+	const end = "key" === config.defSelect ? keyRange.end : valueRange.end;
 
 	window.showTextDocument(defUri, {
 		// Selection参数都是zero-based
@@ -78,7 +83,18 @@ export const disSearch = commands.registerCommand("mathis.searchFromClipboard", 
 		(str, cur) => `${str}${cur.key}: ${cur.value} || [前往](${cur.defUri.fsPath}) \n`,
 		""
 	);
-	window.showInformationMessage(`查找${val}:\n${msg}`);
+	window
+		.showQuickPick(
+			res.map((node) => ({
+				label: node.key,
+				description: node.value,
+				detail: node.defUri.fsPath,
+				node,
+			}))
+		)
+		.then((item) => {
+			commands.executeCommand("mathis.navigateToDef", item?.node);
+		});
 });
 
 // 过滤出语言定义有缺的字段

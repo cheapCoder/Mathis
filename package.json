@@ -8,7 +8,7 @@
 	"icon": "img/logo.png",
 	"main": "./out/src/extension.js",
 	"engines": {
-		"vscode": "^1.62.0"
+		"vscode": "^1.65.0"
 	},
 	"categories": [
 		"Other"
@@ -17,7 +17,12 @@
 		"workspaceContains:**/locale/**/*.{js,ts,jsx,tsx,json}"
 	],
 	"contributes": {
-		"commands": [],
+		"commands": [
+			{
+				"command": "mathis.colorRef",
+				"title": "update color by shoplazza"
+			}
+		],
 		"languages": [
 			{
 				"id": "svelte",
@@ -40,14 +45,65 @@
 			{
 				"title": "Mathis",
 				"properties": {
-					"mathis.lazyLoadApply": {
+					"mathis.themeUpdateLink": {
 						"order": 0,
+						"description": "主题升级的css链接",
+						"type": "string",
+						"default": "https://assets.shoplazza.com/sds/0.1.1/design-tokens.css"
+					},
+					"mathis.themeUpdateIgnoreColors": {
+						"order": 1,
+						"description": "替换中忽略的color",
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"uniqueItems": true
+					},
+					"mathis.themeUpdateIncludeGlob": {
+						"order": 2,
+						"markdownDescription": "主题升级涉及文件包含:[(使用vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern)",
+						"type": "string",
+						"default": "src/**/*"
+					},
+					"mathis.themeUpdateExcludeGlob": {
+						"order": 3,
+						"markdownDescription": "主题升级涉及文件排除:[(使用vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern)",
+						"type": "string",
+						"default": "**/{node_modules,dist,out,test,assets}/**"
+					},
+					"mathis.defIncludeGlob": {
+						"order": 4,
+						"markdownDescription": "定义文件包含:[(使用vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern)",
+						"type": "string",
+						"default": "src/**/locale/{en_US,zh_CN}.{ts,js,json}"
+					},
+					"mathis.defExcludeGlob": {
+						"order": 5,
+						"markdownDescription": "定义文件排除:[(使用vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern)",
+						"type": "string",
+						"default": "**/{node_modules,dist,out,test,assets}/**"
+					},
+					"mathis.applyIncludeGlob": {
+						"order": 6,
+						"markdownDescription": "应用文件包含:[(使用vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern)",
+						"type": "string",
+						"default": "src/**/*.{ts,js,tsx,jsx,svelte,vue}"
+					},
+					"mathis.applyExcludeGlob": {
+						"order": 7,
+						"markdownDescription": "应用文件排除:[(使用vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern)",
+						"type": "string",
+						"default": "**/{node_modules,dist,out,test,assets}/**"
+					},
+					"mathis.lazyLoadApply": {
+						"order": 8,
 						"description": "是否直到进入国际化定义文件才加载字段应用列表",
 						"type": "boolean",
 						"default": true
 					},
 					"mathis.detectApplyWay": {
-						"order": 1,
+						"order": 9,
 						"description": "检测应用节点的方式\nreg:正则匹配(会有缺失)); split:分词在def中查找(会有多余)",
 						"type": "string",
 						"default": "split",
@@ -57,7 +113,7 @@
 						]
 					},
 					"mathis.defSelect": {
-						"order": 2,
+						"order": 10,
 						"description": "跳转定义文件时选择字段的哪些部分",
 						"type": "string",
 						"default": "value",
@@ -68,16 +124,16 @@
 						]
 					},
 					"mathis.pathSlice.enabled": {
-						"order": 3,
+						"order": 11,
 						"type": "boolean",
 						"default": true,
 						"description": "显示路径时去除src之前的部分"
 					},
 					"mathis.statusBar.enabled": {
-						"order": 4,
+						"order": 12,
 						"type": "boolean",
 						"default": true,
-						"description": "在左下方显示查找按钮，行为与cmd+shift+v相同"
+						"description": "在左下方显示查找按钮,其行为与cmd+shift+v相同"
 					}
 				}
 			}
@@ -96,18 +152,18 @@
 		"@types/glob": "^7.2.0",
 		"@types/json-to-ast": "^2.1.2",
 		"@types/lodash": "^4.14.179",
-		"@types/mocha": "^9.0.0",
-		"@types/node": "14.x",
-		"@types/vscode": "^1.62.0",
-		"@typescript-eslint/eslint-plugin": "^5.1.0",
-		"@typescript-eslint/parser": "^5.1.0",
+		"@types/mocha": "^9.1.0",
+		"@types/node": "^14.18.12",
+		"@types/vscode": "^1.65.0",
+		"@typescript-eslint/eslint-plugin": "^5.15.0",
+		"@typescript-eslint/parser": "^5.15.0",
 		"@vscode/test-electron": "^1.6.2",
-		"eslint": "^8.1.0",
-		"mocha": "^9.1.3",
-		"typescript": "^4.4.4"
+		"eslint": "^8.11.0",
+		"mocha": "^9.2.2",
+		"typescript": "^4.6.2"
 	},
 	"dependencies": {
-		"@babel/types": "^7.16.0",
+		"@babel/types": "^7.17.0",
 		"acorn": "^8.7.0",
 		"json-to-ast": "^2.1.0",
 		"lodash": "^4.17.21"
