@@ -47,21 +47,34 @@ class Config {
 
 	constructor() {
 		this.mergeConfig();
+<<<<<<< HEAD
+=======
+
+>>>>>>> eb7bfba3096c25f6ba0a7242b165bd7423792b5c
 		workspace.onDidChangeConfiguration(this.mergeConfig.bind(this));
 	}
 
 	async init() {
 		await Promise.all([this.distinguishFiles(), this.findI18nLib()]);
+
+		console.log(this);
 	}
 
 	private mergeConfig() {
 		const conf = workspace.getConfiguration(this.projectName);
 
+<<<<<<< HEAD
 		Object.keys(this).forEach((key) => {
 			if (conf[key] && !(this[key] instanceof Function)) {
 				this[key] = conf[key];
 			}
 		});
+=======
+		this.lazyLoadApply = conf.lazyLoadApply;
+		this.detectApplyWay = conf.detectApplyWay;
+		this.pathSlice = conf.pathSlice;
+		this.defSelect = conf.defSelect;
+>>>>>>> eb7bfba3096c25f6ba0a7242b165bd7423792b5c
 	}
 
 	private async distinguishFiles() {

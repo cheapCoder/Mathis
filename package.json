@@ -3,7 +3,11 @@
 	"publisher": "happyHacking",
 	"displayName": "Mathis",
 	"description": "一个辅助国际化显示的轻量插件",
+<<<<<<< HEAD
 	"version": "0.3.1",
+=======
+	"version": "0.2.2",
+>>>>>>> eb7bfba3096c25f6ba0a7242b165bd7423792b5c
 	"repository": "https://github.com/necessityOVO/mathis",
 	"icon": "img/logo.png",
 	"main": "./out/src/extension.js",
@@ -97,14 +101,23 @@
 						"default": "**/{node_modules,dist,out,test,assets}/**"
 					},
 					"mathis.lazyLoadApply": {
+<<<<<<< HEAD
 						"order": 8,
+=======
+						"order": 0,
+>>>>>>> eb7bfba3096c25f6ba0a7242b165bd7423792b5c
 						"description": "是否直到进入国际化定义文件才加载字段应用列表",
 						"type": "boolean",
 						"default": true
 					},
 					"mathis.detectApplyWay": {
+<<<<<<< HEAD
 						"order": 9,
 						"description": "检测应用节点的方式\nreg:正则匹配(会有缺失)); split:分词在def中查找(会有多余)",
+=======
+						"order": 1,
+						"description": "检测应用节点的方式\nreg:正则匹配; split:分词在def中查找(检测更完备)",
+>>>>>>> eb7bfba3096c25f6ba0a7242b165bd7423792b5c
 						"type": "string",
 						"default": "split",
 						"enum": [
@@ -113,7 +126,11 @@
 						]
 					},
 					"mathis.defSelect": {
+<<<<<<< HEAD
 						"order": 10,
+=======
+						"order": 2,
+>>>>>>> eb7bfba3096c25f6ba0a7242b165bd7423792b5c
 						"description": "跳转定义文件时选择字段的哪些部分",
 						"type": "string",
 						"default": "value",
@@ -123,8 +140,13 @@
 							"key and value"
 						]
 					},
+<<<<<<< HEAD
 					"mathis.pathSlice.enabled": {
 						"order": 11,
+=======
+					"mathis.pathSlice": {
+						"order": 3,
+>>>>>>> eb7bfba3096c25f6ba0a7242b165bd7423792b5c
 						"type": "boolean",
 						"default": true,
 						"description": "显示路径时去除src之前的部分"
