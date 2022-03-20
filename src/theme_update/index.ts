@@ -136,7 +136,13 @@ class ThemeUpdater {
 			passEdits = false;
 			edits = new WorkspaceEdit();
 		}
-		const document = await workspace.openTextDocument(file);
+		let document;
+		try {
+			document = await workspace.openTextDocument(file);
+		} catch (e) {
+			console.log(e);
+			return;
+		}
 		const diaList: Diagnostic[] = [];
 		let regRes;
 		for (let line = 0; line < document.lineCount; line++) {
