@@ -1,84 +1,72 @@
-# mathis 
+# Mathis
 
-a extension for making i18n looking convenient
+一个辅助国际化显示的 vscode 小插件
+
+![](https://github.com/cheapCoder/mathis/blob/develop/img/intro.gif?raw=true)
+
+> activationEvents: "workspaceContains:\*\*/locale/\*\*/*.{js,ts,jsx,tsx,json}"
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
-
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
-
-## Requirements
-
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+- [x] 从应用点 hover 显示定义位置及多语言值
+- [x] 从定义位置 hover 显示应用列表及应用行文本
+- [x] 支持复制值
+- [x] 快捷键(cmd+shift+v)或左下角的查找按钮查找值
+- [x] 支持用户设置 locale 路径
+- [ ] 支持检测未使用或定义不完全的字段
+- [ ] 添加缓存，减少插件启动时扫描
+- [ ] def 文件内展示应用还是定义列表
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+| 设置名           | 类型                                | 默认值                                        | 描述                                                                                                   |
+| ---------------- | ----------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| defIncludeGlob   | string                              | src/\*\*/locale/{en_US,zh_CN}.{ts,js,json}    | 定义文件包含:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
+| defExcludeGlob   | string                              | \*\*/{node_modules,dist,out,test,assets}/\*\* | 定义文件排除:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
+| applyIncludeGlob | string                              | src/\*_/_.{ts,js,tsx,jsx,svelte,vue}          | 应用文件包含:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
+| lazyLoadApply    | boolean                             | true                                          | 是否直到进入国际化定义文件才加载字段应用列表                                                           |
+| detectApplyWay   | "reg" \| "split"                    | split                                         | 检测应用节点的方式<br />reg:正则匹配(会有缺失)); split:分词在 def 中查找(会有多余)                     |
+| defSelect        | "key" \| "value" \| "key and value" | value                                         | 跳转定义文件时选择字段的哪些部分                                                                       |
+| pathSlice        | boolean                             | true                                          | 显示路径时去除 src 之前的部分                                                                          |
+| statusBar        | boolean                             | true                                          | 在左下方显示查找按钮,其行为与 cmd+shift+v 相同                                                         |
 
-For example:
+> "reg"：i18n format 函数正则匹配(由于情形众多无法全部匹配，会有缺失);
+> "split"：文本使用分号分词，逐个在定义列表中查找的方式确定是否为 i18n key(由于不通过 format 函数名匹配，会有多余);
 
-This extension contributes the following settings:
+## Something Else
 
-- `myExtension.enable`: enable/disable this extension
-- `myExtension.thing`: set to `blah` to do something
+- 为了简单直接，插件只监听文件的保存(节流 1s)，不监听文件删除，重命名等行为
+- 使用定义文件的文件名作为语言显示
+- 所有位置存储 base-one
 
-## Known Issues
+# For theme update
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+![](https://github.com/cheapCoder/mathis/blob/develop/img/color_update.gif?raw=true)
 
-## Release Notes
+> activationEvents: "*"
 
-Users appreciate release notes as you update your extension.
+| 设置名                  | 类型     | 默认值                                                     | 描述                                                                                                           |
+| ----------------------- | -------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| themeUpdateLink         | string   | "https://assets.shoplazza.com/sds/0.1.1/design-tokens.css" | 主题升级的 css 链接                                                                                            |
+| themeUpdateIgnoreColors | string[] | []                                                         | 替换中忽略的 color                                                                                             |
+| themeUpdateIncludeGlob  | string   | src/\*\*_/_\*                                              | 主题升级涉及文件包含:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
+| themeUpdateExcludeGlob  | string   | \*\*/{node_modules,dist,out,test,assets}/\*\*              | 主题升级涉及文件排除:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
 
-### 1.0.0
+按`f1`显示所有命名，搜索`color update by shoplazza`并确定，即会尝试替换颜色为 css 变量。
 
-Initial release of ...
+对于一个给定的颜色：
 
-### 1.0.1
+1. 当存在一个 css 变量对应时，会直接替换(建议在 git 里检查)
+2. 当不存在 css 变量对应时，会添加`warn提示`(黄色波浪底线和弃用横线)
 
-Fixed issue #.
+![](https://github.com/cheapCoder/mathis/blob/develop/img/warn_color.png?raw=true)
 
-### 1.1.0
+3. 当存在多个 css 变量对应时，会添加`info提示`(蓝色波浪底线)。在光标聚焦后,可通过 hover 的`快速修复...`选择替换哪个 css 变量，或者用快捷键`cmd+.`选择
 
-Added features X, Y, and Z.
+![](https://github.com/cheapCoder/mathis/blob/develop/img/info_color.png?raw=true)
 
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-- [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-- Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-- Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-- Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-- [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-- [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
-
-### i18n-ally 不支持
-
-- i18n 库的 format 函数内使用三元判断 id 时无法检测到
-- 无 locale 源文件映射到应用文件
+> `info提示`也可在`问题`中快速选择替换哪个变量，详情见 gif
 
 ### 工具：
 
 - [ast explorer](https://astexplorer.net/)
-
-### 规范：
-
-- 所有位置存储 base-one

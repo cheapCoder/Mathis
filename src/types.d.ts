@@ -8,21 +8,30 @@ declare interface LocaleFile {
 }
 
 declare interface AstMeta {
-	lang?: string;
-	uri?: import("vscode").Uri;
+	lang: string;
+	uri: import("vscode").Uri;
 }
 
 declare type ActiveFileType = "define" | "apply";
 
 declare type I18nLibType = "react-intl" | "svelte-i18n" | undefined;
 
-declare type LocaleMapType = {
-	[value: string]: { [lang: string]: import("./manger").DefNode };
-};
+declare type DefMapType = Map<string, Map<string, DefNode>>;
 
-declare type ApplyInfo = {
+declare interface DefNode {
 	key: string;
-	location: import("vscode").Location;
+	value: string;
+	keyRange: import("vscode").Range;
+	valueRange: import("vscode").Range;
+	lang: string;
+	defUri: import("vscode").Uri;
+}
+
+declare type ApplyMapType = Map<string, ApplyNode[]>;
+
+declare interface ApplyNode {
+	key: string;
+	loc: import("vscode").Location;
 	code: string;
 	languageId: string;
-};
+}
