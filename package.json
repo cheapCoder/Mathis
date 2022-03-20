@@ -14,7 +14,7 @@
 		"Other"
 	],
 	"activationEvents": [
-		"workspaceContains:**/locale/**/*.{js,ts,jsx,tsx,json}"
+		"*"
 	],
 	"contributes": {
 		"commands": [

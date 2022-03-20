@@ -4,6 +4,8 @@
 
 ![](https://github.com/cheapCoder/mathis/blob/develop/img/intro.gif?raw=true)
 
+> activationEvents: "workspaceContains:\*\*/locale/\*\*/*.{js,ts,jsx,tsx,json}"
+
 ## Features
 
 - [x] 从应用点 hover 显示定义位置及多语言值
@@ -37,9 +39,11 @@
 - 使用定义文件的文件名作为语言显示
 - 所有位置存储 base-one
 
-## For theme update
+# For theme update
 
 ![](https://github.com/cheapCoder/mathis/blob/develop/img/color_update.gif?raw=true)
+
+> activationEvents: "*"
 
 | 设置名                  | 类型     | 默认值                                                     | 描述                                                                                                           |
 | ----------------------- | -------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
