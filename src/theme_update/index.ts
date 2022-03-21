@@ -1,6 +1,7 @@
 import https from "https";
 import { URL } from "url";
 import {
+	CancellationToken,
 	CodeAction,
 	CodeActionContext,
 	CodeActionKind,
@@ -11,8 +12,11 @@ import {
 	DiagnosticSeverity,
 	DiagnosticTag,
 	ExtensionContext,
+	Hover,
 	languages,
 	Location,
+	MarkdownString,
+	Position,
 	Range,
 	Selection,
 	TextDocument,
@@ -24,13 +28,17 @@ import {
 import config from "../config";
 
 class ThemeUpdater {
-	public static readonly SHOPLAZZA_TEAM = "Shoplazza FE";
+	public static readonly SHOPLAZZA_TEAM = "SHOPLAZZA FE";
 	public curColorLink = "";
 	public colorReg = /#([\da-f]{8}|[\da-f]{6}|[\da-f]{3})(?=[;\s])/gi;
-	public cssMap = new Map<string, string[]>();
+	public valueMap = new Map<string, string[]>();
+	public nameMap = new Map<string, string>();
 	public diagnosticsCollection = languages.createDiagnosticCollection("Shoplazza FE");
 
 	constructor(context: ExtensionContext) {
+		const self = this;
+
+		this.parse(config.themeUpdateLink);
 		// 创建code action provider
 		const themeActionDis = languages.registerCodeActionsProvider("*", this.colorProvider, {
 			providedCodeActionKinds: this.colorProvider.providedCodeActionKinds,
@@ -38,7 +46,7 @@ class ThemeUpdater {
 
 		// 添加命令
 		const colorRefDis = commands.registerCommand("mathis.colorRef", async () => {
-			if (this.cssMap.size === 0 || this.curColorLink !== config.themeUpdateLink) {
+			if (this.valueMap.size === 0 || this.curColorLink !== config.themeUpdateLink) {
 				if (!config.themeUpdateLink) {
 					window.showErrorMessage("未找到css链接设置");
 					return;
@@ -85,11 +93,35 @@ class ThemeUpdater {
 			}
 		);
 
+		//css var hover show value
+		const colorValDis = languages.registerHoverProvider("*", {
+			provideHover(document: TextDocument, position: Position, token: CancellationToken) {
+				const lineText = document.lineAt(position.line).text;
+				let reg = /var\((.*?)\)/gi;
+				let cur;
+				while ((cur = reg.exec(lineText))) {
+					const value = self.nameMap.get(cur[1]);
+
+					if (value && position.character >= cur.index && position.character < cur.index + cur[0].length) {
+						const ms = new MarkdownString(
+							`rgb: ${value} [$(explorer-view-icon)](command:mathis.copy?${encodeURIComponent(
+								JSON.stringify({ value })
+							)} "复制")`,
+							true
+						);
+						ms.isTrusted = true;
+						return new Hover(ms);
+					}
+				}
+			},
+		});
+
 		context.subscriptions.push(
 			themeActionDis,
 			colorRefDis,
 			replaceColorDis,
 			ignoreColorDis,
+			colorValDis,
 			this.diagnosticsCollection
 		);
 	}
@@ -155,7 +187,7 @@ class ThemeUpdater {
 					continue;
 				}
 				const range = new Range(line, regRes.index, line, regRes.index + regRes[0].length);
-				const arr = this.cssMap.get(color);
+				const arr = this.valueMap.get(color);
 
 				if (arr && arr.length === 1) {
 					// 只有一个直接替换
@@ -184,31 +216,6 @@ class ThemeUpdater {
 		if (!passEdits) {
 			workspace.applyEdit(edits);
 		}
-		// let text = (await workspace.fs.readFile(file)).toString();
-
-		// let delta = 0;
-		// text = text.replaceAll(this.colorReg, (...args) => {
-		// 	// match, val, offset, string
-		// 	// 格式化颜色
-		// 	args[1] = this.formatColor(args[1]);
-		// 	if (cssMap.has(args[1])) {
-		// 		// console.log(args);
-
-		// 		const arr = cssMap.get(args[1]);
-		// 		if (arr?.length === 1) {
-		// 			// 只有一个直接替换
-		// 			const str = `var(${arr[0]})${args[3]}`;
-
-		// 			delta += str.length - args[0].length;
-		// 			return str;
-		// 		} else {
-		// 			// 大于1个生成诊断action
-		// 			let offset = args[4] + delta;
-		// 		}
-		// 	}
-		// 	return args[0];
-		// });
-		// workspace.fs.writeFile(file, Buffer.from(text, "utf8"));
 	}
 
 	private formatColor(val: string) {
@@ -262,6 +269,7 @@ class ThemeUpdater {
 		}
 		text = text.replace(/\n/g, "");
 
+		// let repeatNameList = new Set();
 		let reg = /(.*?)\{([\w\W]*?)\}/g;
 		let cur;
 		while ((cur = reg.exec(text))) {
@@ -271,14 +279,20 @@ class ThemeUpdater {
 					return;
 				}
 				let item = line.split(":").map((v) => v.trim().toLowerCase());
+				// if (this.nameMap.has(item[0])) {
+				// 	repeatNameList.add(item[0]);
+				// }
+				// 添加name-value
+				this.nameMap.set(item[0], item[1]);
 
+				// 添加value - name[]
 				if (this.colorReg.test(item[1] + ";")) {
 					item[1] = this.formatColor(item[1]);
 				}
-				if (!this.cssMap.has(item[1])) {
-					this.cssMap.set(item[1], []);
+				if (!this.valueMap.has(item[1])) {
+					this.valueMap.set(item[1], []);
 				}
-				this.cssMap.get(item[1])?.push(item[0]);
+				this.valueMap.get(item[1])?.push(item[0]);
 			});
 		}
 	}
