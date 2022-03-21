@@ -146,7 +146,7 @@ class ThemeUpdater {
 		const diaList: Diagnostic[] = [];
 		let regRes;
 		for (let line = 0; line < document.lineCount; line++) {
-			const text = document.lineAt(line).text;
+			const text = document.lineAt(line).text.toLowerCase();
 			const reg = new RegExp(this.colorReg.source, "gi");
 
 			while ((regRes = reg.exec(text))) {
@@ -270,7 +270,7 @@ class ThemeUpdater {
 				if (array.length - 1 === i) {
 					return;
 				}
-				let item = line.split(":").map((v) => v.trim());
+				let item = line.split(":").map((v) => v.trim().toLowerCase());
 
 				if (this.colorReg.test(item[1] + ";")) {
 					item[1] = this.formatColor(item[1]);
