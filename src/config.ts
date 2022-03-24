@@ -8,7 +8,7 @@ interface LibFormatRegMap {
 
 class Config {
 	public projectName = packageJson.name;
-	public splitLetters = ["'", '"', "`"];
+	public splitLetters = ["'", '"'];
 	public activeFileLanguage = [
 		"javascript",
 		"javascriptreact",
@@ -28,7 +28,7 @@ class Config {
 	public applyList: Uri[] = [];
 	public defList: Uri[] = [];
 
-	public lazyLoadApply = true;
+	// public lazyLoadApply = true;
 	public detectApplyWay = "split";
 	public pathSlice = true;
 	public defSelect = "value";

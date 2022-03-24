@@ -76,7 +76,7 @@
 						"order": 4,
 						"markdownDescription": "定义文件包含:[(使用vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern)",
 						"type": "string",
-						"default": "src/**/locale/{en_US,zh_CN}.{ts,js,json}"
+						"default": "src/**/locale/*.{ts,js,json}"
 					},
 					"mathis.defExcludeGlob": {
 						"order": 5,
@@ -95,12 +95,6 @@
 						"markdownDescription": "应用文件排除:[(使用vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern)",
 						"type": "string",
 						"default": "**/{node_modules,dist,out,test,assets}/**"
-					},
-					"mathis.lazyLoadApply": {
-						"order": 8,
-						"description": "是否直到进入国际化定义文件才加载字段应用列表",
-						"type": "boolean",
-						"default": true
 					},
 					"mathis.detectApplyWay": {
 						"order": 9,

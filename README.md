@@ -2,9 +2,15 @@
 
 一个辅助国际化显示的 vscode 小插件
 
+> activationEvents: "workspaceContains:\*\*/locale/\*\*/\*.{js,ts,jsx,tsx,json}"
+
+- 定义位置与应用位置的相互跳转
+
 ![](https://github.com/cheapCoder/mathis/blob/develop/img/intro.gif?raw=true)
 
-> activationEvents: "workspaceContains:\*\*/locale/\*\*/*.{js,ts,jsx,tsx,json}"
+- 从剪切板搜索
+
+![](https://github.com/cheapCoder/mathis/blob/develop/img/search.gif?raw=true)
 
 ## Features
 
@@ -24,13 +30,13 @@
 | defIncludeGlob   | string                              | src/\*\*/locale/{en_US,zh_CN}.{ts,js,json}    | 定义文件包含:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
 | defExcludeGlob   | string                              | \*\*/{node_modules,dist,out,test,assets}/\*\* | 定义文件排除:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
 | applyIncludeGlob | string                              | src/\*_/_.{ts,js,tsx,jsx,svelte,vue}          | 应用文件包含:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
-| lazyLoadApply    | boolean                             | true                                          | 是否直到进入国际化定义文件才加载字段应用列表                                                           |
 | detectApplyWay   | "reg" \| "split"                    | split                                         | 检测应用节点的方式<br />reg:正则匹配(会有缺失)); split:分词在 def 中查找(会有多余)                     |
 | defSelect        | "key" \| "value" \| "key and value" | value                                         | 跳转定义文件时选择字段的哪些部分                                                                       |
 | pathSlice        | boolean                             | true                                          | 显示路径时去除 src 之前的部分                                                                          |
 | statusBar        | boolean                             | true                                          | 在左下方显示查找按钮,其行为与 cmd+shift+v 相同                                                         |
 
 > "reg"：i18n format 函数正则匹配(由于情形众多无法全部匹配，会有缺失);
+>
 > "split"：文本使用分号分词，逐个在定义列表中查找的方式确定是否为 i18n key(由于不通过 format 函数名匹配，会有多余);
 
 ## Something Else
@@ -43,7 +49,7 @@
 
 ![](https://github.com/cheapCoder/mathis/blob/develop/img/color_update.gif?raw=true)
 
-> activationEvents: "*"
+> activationEvents: "\*"
 
 | 设置名                  | 类型     | 默认值                                                     | 描述                                                                                                           |
 | ----------------------- | -------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |

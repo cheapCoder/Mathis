@@ -1,6 +1,6 @@
-import { ExtensionContext, TextDocument, Uri, window, workspace } from "vscode";
 import throttle from "lodash/throttle";
 import path from "path";
+import { ExtensionContext, TextDocument, Uri, window, workspace } from "vscode";
 import config from "./config";
 import applyParser from "./parser/apply";
 import defParser from "./parser/def";
@@ -22,9 +22,9 @@ class Manger {
 		this._activeFileType = val;
 
 		// 懒加载到打开locale文件时再实例化
-		if (val === "define" && this.applyMap.size === 0) {
-			this.updateApply();
-		}
+		// if (val === "define" && this.applyMap.size === 0) {
+		// 	this.updateApply();
+		// }
 	}
 
 	constructor() {
@@ -59,10 +59,10 @@ class Manger {
 		// init def node
 		await this.updateDef();
 
-		if (!config.lazyLoadApply) {
-			// init apply node
-			await this.updateApply();
-		}
+		// if (!config.lazyLoadApply) {
+		// init apply node
+		await this.updateApply();
+		// }
 	}
 
 	private async updateDef(list: Uri[] = config.defList) {

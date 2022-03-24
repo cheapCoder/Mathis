@@ -260,6 +260,9 @@ class ThemeUpdater {
 	}
 
 	private async parse(link: string): Promise<void> {
+		this.nameMap.clear();
+		this.valueMap.clear();
+
 		let text = "";
 		try {
 			text = await this.getText(link);

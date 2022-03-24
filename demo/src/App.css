@@ -1,0 +1,5 @@
+.demo {
+	color: var(--color-critical-default);
+	border-color: var(--color-color-branding-logo-red);
+	background-color: #123;
+}
