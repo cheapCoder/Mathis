@@ -3,7 +3,7 @@
 	"publisher": "happyHacking",
 	"displayName": "Mathis",
 	"description": "一个辅助国际化显示的轻量插件",
-	"version": "0.3.6",
+	"version": "0.3.7",
 	"repository": "https://github.com/necessityOVO/mathis",
 	"icon": "img/logo.png",
 	"main": "./out/src/extension.js",
