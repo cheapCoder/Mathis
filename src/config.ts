@@ -1,4 +1,4 @@
-import { window, workspace } from "vscode";
+import { workspace } from "vscode";
 import packageJson from "../package.json";
 
 interface LibFormatRegMap {
@@ -87,7 +87,7 @@ class Config {
 				(name) => packageJson["dependencies"][name]
 			) as I18nLibType;
 		} catch (e) {
-			console.log("未发现package.json文件或i18n库依赖");
+			// console.log("未发现package.json文件或i18n库依赖");
 		}
 	}
 }
