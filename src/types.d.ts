@@ -12,7 +12,7 @@ declare interface AstMeta {
 	uri: import("vscode").Uri;
 }
 
-declare type ActiveFileType = "define" | "apply";
+declare type ActiveFileType = "define" | "apply" | "other";
 
 declare type I18nLibType = "react-intl" | "svelte-i18n" | undefined;
 

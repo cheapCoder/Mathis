@@ -136,7 +136,7 @@ class ThemeUpdater {
 			const diag = context.diagnostics[0];
 
 			// @ts-ignore
-			const res: CodeAction[] = diag["replaceList"].map((val: string) => {
+			const res: CodeAction[] = (diag["replaceList"] || []).map((val: string) => {
 				const action = new CodeAction(`替换为:${val}`, CodeActionKind.QuickFix);
 				action.command = {
 					command: "mathis.replaceColor",
@@ -153,10 +153,8 @@ class ThemeUpdater {
 			ignoreAction.command = {
 				command: "mathis.ignoreColor",
 				title: "ignore color",
-				arguments: [diag.relatedInformation![0].message],
+				arguments: [diag.relatedInformation?.[0].message],
 			};
-			// @ts-ignore
-			ignoreAction["replaceList"] = [];
 			res.push(ignoreAction);
 			return res;
 		},

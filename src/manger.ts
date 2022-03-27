@@ -1,9 +1,9 @@
-import throttle from "lodash/throttle";
 import path from "path";
-import { ExtensionContext, TextDocument, Uri, window, workspace } from "vscode";
+import { ExtensionContext, Uri, window, workspace } from "vscode";
 import config from "./config";
 import applyParser from "./parser/apply";
 import defParser from "./parser/def";
+import DelayCell from "./util/DelayCell";
 
 class Manger {
 	public i18nLib: I18nLibType;
@@ -14,7 +14,7 @@ class Manger {
 	public applyMap: ApplyMapType = new Map();
 	public applyFileBuckets = new Map<string, Array<string>>();
 
-	private _activeFileType: ActiveFileType = "apply";
+	private _activeFileType: ActiveFileType = "other";
 	public get activeFileType() {
 		return this._activeFileType;
 	}
@@ -29,32 +29,49 @@ class Manger {
 
 	constructor() {
 		window.onDidChangeActiveTextEditor((e) => {
-			if (!e) {
-				return;
+			if (config.defList.includes(e?.document.uri.fsPath!)) {
+				this.activeFileType = "define";
+			} else if (config.applyList.includes(e?.document.uri.fsPath!)) {
+				this.activeFileType = "apply";
+			} else {
+				this.activeFileType = "other";
 			}
-			this.activeFileType = config.defList.find((u) => u.fsPath === e.document.fileName) ? "define" : "apply";
 		});
-
-		workspace.onDidSaveTextDocument(
-			throttle(
-				(e: TextDocument) => {
-					this.activeFileType === "define" ? this.updateDef([e.uri]) : this.updateApply([e.uri]);
-				},
-				1000,
-				{ leading: false, trailing: true }
-			)
-		);
 	}
 
 	public async init(context: ExtensionContext) {
 		this.context = context;
+
+		// 监听文件修改
+		const watcher = workspace.createFileSystemWatcher(
+			`${workspace.workspaceFolders?.[0].uri.fsPath || "**"}/src/**/*`
+		);
+		const cell = new DelayCell(
+			(list: Uri[][]) => {
+				const dl: Uri[] = [];
+				const al: Uri[] = [];
+				list.forEach((args) => {
+					if (config.defList.includes(args[0].fsPath)) {
+						dl.push(args[0]);
+					} else if (config.applyList.includes(args[0].fsPath)) {
+						al.push(args[0]);
+					}
+				});
+				this.updateDef(dl);
+				this.updateApply(al);
+			},
+			(e: Uri) => e.fsPath
+		);
+		watcher.onDidChange(cell.callback.bind(cell));
+
 		await config.init();
 
-		this.activeFileType = config.defList.find(
-			(u) => u.fsPath === (window.activeTextEditor || window.visibleTextEditors[0])?.document.fileName
-		)
-			? "define"
-			: "apply";
+		const fsPath = window.activeTextEditor?.document.fileName || "";
+		if (config.defList.includes(fsPath)) {
+			this.activeFileType = "define";
+		} else if (config.applyList.includes(fsPath)) {
+			this.activeFileType = "apply";
+		}
 
 		// init def node
 		await this.updateDef();
@@ -65,7 +82,7 @@ class Manger {
 		// }
 	}
 
-	private async updateDef(list: Uri[] = config.defList) {
+	private async updateDef(list: Uri[] = config.defList.map(Uri.file)) {
 		// def node查找
 		const res = await Promise.all(list.map((u) => defParser.parse(u)));
 
@@ -91,7 +108,7 @@ class Manger {
 		});
 	}
 
-	private async updateApply(list: Uri[] = config.applyList) {
+	private async updateApply(list: Uri[] = config.applyList.map(Uri.file)) {
 		const res = await Promise.all(list.map((uri) => applyParser.parse(uri, this.defMap)));
 
 		// TODO:优化

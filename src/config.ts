@@ -1,4 +1,4 @@
-import { Uri, window, workspace } from "vscode";
+import { window, workspace } from "vscode";
 import packageJson from "../package.json";
 
 interface LibFormatRegMap {
@@ -25,8 +25,8 @@ class Config {
 		"svelte-i18n": [/(?<=\$_\(['"])[\w\d_-]+(?=['"].*?\))/],
 	};
 
-	public applyList: Uri[] = [];
-	public defList: Uri[] = [];
+	public applyList: string[] = [];
+	public defList: string[] = [];
 
 	// public lazyLoadApply = true;
 	public detectApplyWay = "split";
@@ -67,12 +67,14 @@ class Config {
 	private async distinguishFiles() {
 		// 查找定义文件
 		// ts,js,json格式的多语言文件
-		this.defList = await workspace.findFiles(this.defIncludeGlob, this.defExcludeGlob);
+		this.defList = (await workspace.findFiles(this.defIncludeGlob, this.defExcludeGlob)).map((v) => v.fsPath);
 
 		// 查找应用文件
-		this.applyList = await workspace.findFiles(this.applyIncludeGlob, this.applyExcludeGlob);
+		this.applyList = (await workspace.findFiles(this.applyIncludeGlob, this.applyExcludeGlob)).map(
+			(v) => v.fsPath
+		);
 		// 过滤匹配的locale定义文件
-		this.applyList = this.applyList.filter((al) => !this.defList.find((dl) => dl.fsPath === al.fsPath));
+		this.applyList = this.applyList.filter((al) => !this.defList.includes(al));
 	}
 
 	private async findI18nLib() {
@@ -85,7 +87,7 @@ class Config {
 				(name) => packageJson["dependencies"][name]
 			) as I18nLibType;
 		} catch (e) {
-			window.showErrorMessage("未发现package.json文件或i18n库依赖");
+			console.log("未发现package.json文件或i18n库依赖");
 		}
 	}
 }

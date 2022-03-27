@@ -2,8 +2,6 @@
 
 一个辅助国际化显示的 vscode 小插件
 
-> activationEvents: "workspaceContains:\*\*/locale/\*\*/\*.{js,ts,jsx,tsx,json}"
-
 - 定义位置与应用位置的相互跳转
 
 ![](https://github.com/cheapCoder/mathis/blob/develop/img/intro.gif?raw=true)
@@ -21,6 +19,7 @@
 - [x] 支持用户设置 locale 路径
 - [ ] 支持检测未使用或定义不完全的字段
 - [ ] 添加缓存，减少插件启动时扫描
+- [ ] 支持多工作区
 - [ ] def 文件内展示应用还是定义列表
 
 ## Extension Settings
@@ -48,8 +47,6 @@
 # For theme update
 
 ![](https://github.com/cheapCoder/mathis/blob/develop/img/color_update.gif?raw=true)
-
-> activationEvents: "\*"
 
 | 设置名                  | 类型     | 默认值                                                     | 描述                                                                                                           |
 | ----------------------- | -------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |

@@ -6,9 +6,11 @@ import { getRestrictValue } from "../util";
 
 export const dispatchHover = () => ({
 	provideHover(document: TextDocument, position: Position, token: CancellationToken) {
-		return manger.activeFileType === "define"
-			? showApplyHover(document, position)
-			: showDefHover(document, position);
+		if (manger.activeFileType === "define") {
+			return showApplyHover(document, position);
+		} else if (manger.activeFileType === "apply") {
+			return showDefHover(document, position);
+		}
 	},
 });
 
