@@ -33,25 +33,22 @@ class ThemeUpdater {
 	public colorReg = /#([\da-f]{8}|[\da-f]{6}|[\da-f]{3})(?=[;\s])/gi;
 	public valueMap = new Map<string, string[]>();
 	public nameMap = new Map<string, string>();
-	public diagnosticsCollection = languages.createDiagnosticCollection("Shoplazza FE");
+	public diagnosticsCollection = languages.createDiagnosticCollection(ThemeUpdater.SHOPLAZZA_TEAM);
 
 	constructor(context: ExtensionContext) {
 		const self = this;
 
-		this.parse(config.themeUpdateLink);
 		// 创建code action provider
 		const themeActionDis = languages.registerCodeActionsProvider("*", this.colorProvider, {
 			providedCodeActionKinds: this.colorProvider.providedCodeActionKinds,
 		});
 
-		// 添加命令
 		const colorRefDis = commands.registerCommand("mathis.colorRef", async () => {
 			if (this.valueMap.size === 0 || this.curColorLink !== config.themeUpdateLink) {
 				if (!config.themeUpdateLink) {
 					window.showErrorMessage("未找到css链接设置");
 					return;
 				}
-
 				await this.parse(config.themeUpdateLink);
 				this.curColorLink = config.themeUpdateLink;
 			}
@@ -134,6 +131,9 @@ class ThemeUpdater {
 				return;
 			}
 			const diag = context.diagnostics[0];
+			if (diag.source !== ThemeUpdater.SHOPLAZZA_TEAM) {
+				return;
+			}
 
 			// @ts-ignore
 			const res: CodeAction[] = (diag["replaceList"] || []).map((val: string) => {
@@ -155,6 +155,7 @@ class ThemeUpdater {
 				title: "ignore color",
 				arguments: [diag.relatedInformation?.[0].message],
 			};
+			ignoreAction.diagnostics = [diag];
 			res.push(ignoreAction);
 			return res;
 		},
@@ -229,16 +230,9 @@ class ThemeUpdater {
 
 	private async getText(link: string): Promise<string> {
 		return new Promise((resolve, reject) => {
-			const url = new URL(link);
+			const { hostname, port, pathname: path } = new URL(link);
 
-			const options = {
-				hostname: url.hostname,
-				port: url.port,
-				path: url.pathname,
-				method: "GET",
-			};
-
-			const req = https.request(options, (res) => {
+			const req = https.request({ hostname, port, path, method: "GET" }, (res) => {
 				let text = "";
 				res.on("data", (d) => {
 					text += d;

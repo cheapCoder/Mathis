@@ -3,7 +3,7 @@
 	"publisher": "happyHacking",
 	"displayName": "Mathis",
 	"description": "一个辅助国际化显示的轻量插件",
-	"version": "0.3.7",
+	"version": "0.3.9",
 	"repository": "https://github.com/necessityOVO/mathis",
 	"icon": "img/logo.png",
 	"main": "./out/src/extension.js",
@@ -124,11 +124,11 @@
 						"default": true,
 						"description": "显示路径时去除src之前的部分"
 					},
-					"mathis.statusBar.enabled": {
+					"mathis.delayTime": {
 						"order": 12,
-						"type": "boolean",
-						"default": true,
-						"description": "在左下方显示查找按钮,其行为与cmd+shift+v相同"
+						"type": "number",
+						"default": 1500,
+						"description": "文件修改后更新节点的延时时间"
 					}
 				}
 			}
@@ -149,7 +149,6 @@
 	"devDependencies": {
 		"@types/acorn": "^4.0.6",
 		"@types/glob": "^7.2.0",
-		"@types/json-to-ast": "^2.1.2",
 		"@types/mocha": "^9.1.0",
 		"@types/node": "^14.18.12",
 		"@types/vscode": "^1.65.0",
@@ -163,7 +162,7 @@
 	},
 	"dependencies": {
 		"@babel/types": "^7.17.0",
-		"acorn": "^8.7.0",
-		"json-to-ast": "^2.1.0"
+		"@humanwhocodes/momoa": "^2.0.3",
+		"acorn": "^8.7.0"
 	}
 }

@@ -1,15 +1,17 @@
-import { CancellationToken, Hover, MarkdownString, Position, TextDocument, window } from "vscode";
+import { Hover, MarkdownString, Position, TextDocument, window } from "vscode";
 import path from "path";
 import config from "../config";
 import manger from "../manger";
 import { getRestrictValue } from "../util";
 
 export const dispatchHover = () => ({
-	provideHover(document: TextDocument, position: Position, token: CancellationToken) {
-		if (manger.activeFileType === "define") {
+	provideHover(document: TextDocument, position: Position) {
+		if (config.defList.has(document.fileName)) {
 			return showApplyHover(document, position);
-		} else if (manger.activeFileType === "apply") {
+		} else if (config.applyList.has(document.fileName)) {
 			return showDefHover(document, position);
+		} else {
+			console.log("hover: 无法区分该文件未定义或应用文件");
 		}
 	},
 });
@@ -36,7 +38,6 @@ const showDefHover = (document: TextDocument, position: Position) => {
 			)} "复制")`,
 			true
 		);
-
 		ms.isTrusted = true;
 		ms.supportHtml = true;
 
@@ -53,7 +54,7 @@ const showApplyHover = (document: TextDocument, position: Position) => {
 	const lang = path.parse(document.fileName).name;
 
 	if (!manger.supportLang.has(lang)) {
-		window.showErrorMessage("未找到此定义类型文件的语言类型");
+		console.log("未找到此定义类型文件的语言类型");
 		return;
 	}
 

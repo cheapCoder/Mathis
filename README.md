@@ -1,12 +1,12 @@
 # Mathis
 
-一个辅助国际化显示的 vscode 小插件
+一个辅助国际化显示的vscode插件
 
 - 定义位置与应用位置的相互跳转
 
 ![](https://github.com/cheapCoder/mathis/blob/develop/img/intro.gif?raw=true)
 
-- 从剪切板搜索
+- 从剪切板搜索(cmd+shift+v)
 
 ![](https://github.com/cheapCoder/mathis/blob/develop/img/search.gif?raw=true)
 
@@ -21,6 +21,7 @@
 - [ ] 添加缓存，减少插件启动时扫描
 - [ ] 支持多工作区
 - [ ] def 文件内展示应用还是定义列表
+- [ ] 生成多语言使用报告
 
 ## Extension Settings
 
@@ -40,9 +41,10 @@
 
 ## Something Else
 
-- 为了简单直接，插件只监听文件的保存(节流 1s)，不监听文件删除，重命名等行为
+- 为了简单直接，插件只监听文件的修改(节流 1s)，不监听文件删除，重命名等行为
 - 使用定义文件的文件名作为语言显示
 - 所有位置存储 base-one
+- 内部借助包转化为ast获取位置，因此字段定义文件内不能有语法错误
 
 # For theme update
 
@@ -55,7 +57,7 @@
 | themeUpdateIncludeGlob  | string   | src/\*\*_/_\*                                              | 主题升级涉及文件包含:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
 | themeUpdateExcludeGlob  | string   | \*\*/{node_modules,dist,out,test,assets}/\*\*              | 主题升级涉及文件排除:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
 
-按`f1`显示所有命名，搜索`color update by shoplazza`并确定，即会尝试替换颜色为 css 变量。
+按`f1`显示所有命令，搜索`color update by shoplazza`并确定，即会尝试替换颜色为 css 变量。
 
 对于一个给定的颜色：
 

@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { Parser } from "acorn";
-import JSONParser, { ObjectNode } from "json-to-ast";
+import { parse as parseJSON } from "@humanwhocodes/momoa";
 import path from "path";
 import { Range, Uri, workspace } from "vscode";
 
@@ -34,36 +34,35 @@ class Def {
 	private jsonParse(text: string, meta: AstMeta): DefNode[] {
 		const { lang, uri } = meta;
 
-		return (JSONParser(text) as ObjectNode)["children"]
-			.map((n) => {
-				try {
-					const keyRange = new Range(
-						n["key"]["loc"]["start"]["line"],
-						n["key"]["loc"]["start"]["column"] + 1,
-						n["key"]["loc"]["end"]["line"],
-						n["key"]["loc"]["end"]["column"] - 2
-					);
+		const res = [];
+		parseJSON(text)["body"]["members"].forEach((n) => {
+			try {
+				const keyRange = new Range(
+					n["name"]["loc"]["start"]["line"],
+					n["name"]["loc"]["start"]["column"] + 1,
+					n["name"]["loc"]["end"]["line"],
+					n["name"]["loc"]["end"]["column"] - 2
+				);
 
-					const valueRange = new Range(
-						n["value"]["loc"]["start"]["line"],
-						n["value"]["loc"]["start"]["column"] + 1,
-						n["value"]["loc"]["end"]["line"],
-						n["value"]["loc"]["end"]["column"] - 2
-					);
+				const valueRange = new Range(
+					n["value"]["loc"]["start"]["line"],
+					n["value"]["loc"]["start"]["column"] + 1,
+					n["value"]["loc"]["end"]["line"],
+					n["value"]["loc"]["end"]["column"] - 2
+				);
 
-					return {
-						key: n["key"]["value"],
-						value: n["value"]["value"],
-						keyRange: keyRange,
-						valueRange: valueRange,
-						defUri: uri,
-						lang,
-					};
-				} catch (error) {
-					// console.log(error);
-				}
-			})
-			.filter(Boolean);
+				res.push({
+					key: n["name"]["value"],
+					value: n["value"]["value"],
+					keyRange: keyRange,
+					valueRange: valueRange,
+					defUri: uri,
+					lang,
+				});
+			} catch (error) {}
+		});
+
+		return res;
 	}
 
 	// 解析js/ts ast

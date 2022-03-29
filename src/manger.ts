@@ -1,5 +1,5 @@
 import path from "path";
-import { ExtensionContext, Uri, window, workspace } from "vscode";
+import { ExtensionContext, Uri, workspace } from "vscode";
 import config from "./config";
 import applyParser from "./parser/apply";
 import defParser from "./parser/def";
@@ -14,31 +14,6 @@ class Manger {
 	public applyMap: ApplyMapType = new Map();
 	public applyFileBuckets = new Map<string, Array<string>>();
 
-	private _activeFileType: ActiveFileType = "other";
-	public get activeFileType() {
-		return this._activeFileType;
-	}
-	public set activeFileType(val) {
-		this._activeFileType = val;
-
-		// 懒加载到打开locale文件时再实例化
-		// if (val === "define" && this.applyMap.size === 0) {
-		// 	this.updateApply();
-		// }
-	}
-
-	constructor() {
-		window.onDidChangeActiveTextEditor((e) => {
-			if (config.defList.includes(e?.document.uri.fsPath!)) {
-				this.activeFileType = "define";
-			} else if (config.applyList.includes(e?.document.uri.fsPath!)) {
-				this.activeFileType = "apply";
-			} else {
-				this.activeFileType = "other";
-			}
-		});
-	}
-
 	public async init(context: ExtensionContext) {
 		this.context = context;
 
@@ -51,9 +26,9 @@ class Manger {
 				const dl: Uri[] = [];
 				const al: Uri[] = [];
 				list.forEach((args) => {
-					if (config.defList.includes(args[0].fsPath)) {
+					if (config.defList.has(args[0].fsPath)) {
 						dl.push(args[0]);
-					} else if (config.applyList.includes(args[0].fsPath)) {
+					} else if (config.applyList.has(args[0].fsPath)) {
 						al.push(args[0]);
 					}
 				});
@@ -66,23 +41,16 @@ class Manger {
 
 		await config.init();
 
-		const fsPath = window.activeTextEditor?.document.fileName || "";
-		if (config.defList.includes(fsPath)) {
-			this.activeFileType = "define";
-		} else if (config.applyList.includes(fsPath)) {
-			this.activeFileType = "apply";
-		}
-
 		// init def node
 		await this.updateDef();
 
-		// if (!config.lazyLoadApply) {
 		// init apply node
 		await this.updateApply();
-		// }
+
+		console.log(this);
 	}
 
-	private async updateDef(list: Uri[] = config.defList.map(Uri.file)) {
+	private async updateDef(list: Uri[] = [...config.defList].map(Uri.file)) {
 		// def node查找
 		const res = await Promise.all(list.map((u) => defParser.parse(u)));
 
@@ -108,7 +76,7 @@ class Manger {
 		});
 	}
 
-	private async updateApply(list: Uri[] = config.applyList.map(Uri.file)) {
+	private async updateApply(list: Uri[] = [...config.applyList].map(Uri.file)) {
 		const res = await Promise.all(list.map((uri) => applyParser.parse(uri, this.defMap)));
 
 		// TODO:优化

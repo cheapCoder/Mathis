@@ -1,3 +1,5 @@
+import config from "../config";
+
 export default class DelayCell {
 	private cell: Set<string> = new Set();
 	private args: any[] = [];
@@ -8,7 +10,7 @@ export default class DelayCell {
 	constructor(fn: Function, compareFn: Function, delay?: number, callThis?: object) {
 		this.fn = fn;
 		this.compareFn = compareFn;
-		this.delay = delay || 2000;
+		this.delay = delay || config.delayTime;
 		this.callThis = callThis || globalThis;
 	}
 
@@ -18,7 +20,6 @@ export default class DelayCell {
 		if (this.cell.has(com)) {
 			return;
 		}
-		// console.log(rest[0].document.fileName);
 
 		if (this.cell.size === 0) {
 			setTimeout(() => {
