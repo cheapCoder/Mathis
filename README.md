@@ -1,6 +1,6 @@
 # Mathis
 
-一个辅助国际化显示的vscode插件
+一个辅助国际化显示的 vscode 插件
 
 - 定义位置与应用位置的相互跳转
 
@@ -9,6 +9,10 @@
 - 从剪切板搜索(cmd+shift+v)
 
 ![](https://github.com/cheapCoder/mathis/blob/develop/img/search.gif?raw=true)
+
+- 生成字段使用报告(`generate the locale using report`)
+
+![](https://github.com/cheapCoder/mathis/blob/develop/img/report.png?raw=true)
 
 ## Features
 
@@ -21,7 +25,7 @@
 - [ ] 添加缓存，减少插件启动时扫描
 - [ ] 支持多工作区
 - [ ] def 文件内展示应用还是定义列表
-- [ ] 生成多语言使用报告
+- [x] 生成多语言使用报告
 
 ## Extension Settings
 
@@ -44,7 +48,7 @@
 - 为了简单直接，插件只监听文件的修改(节流 1s)，不监听文件删除，重命名等行为
 - 使用定义文件的文件名作为语言显示
 - 所有位置存储 base-one
-- 内部借助包转化为ast获取位置，因此字段定义文件内不能有语法错误
+- 内部借助包转化为 ast 获取位置，因此字段定义文件内不能有语法错误
 
 # For theme update
 

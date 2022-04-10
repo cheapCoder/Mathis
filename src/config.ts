@@ -88,10 +88,11 @@ class Config {
 			const packageJson = (await import(path))["default"];
 
 			this.i18nLib = Object.keys(this.libFormatRegMap).find(
-				(name) => packageJson["dependencies"][name]
+				// devDependencies
+				(name) => packageJson["dependencies"]?.[name] || packageJson["devDependencies"]?.[name]
 			) as I18nLibType;
 		} catch (e) {
-			console.log("未发现package.json文件或i18n库依赖");
+			// console.log("未发现package.json文件或i18n库依赖");
 		}
 	}
 }

@@ -11,7 +11,7 @@ export const dispatchHover = () => ({
 		} else if (config.applyList.has(document.fileName)) {
 			return showDefHover(document, position);
 		} else {
-			console.log("hover: 无法区分该文件未定义或应用文件");
+			// console.log("hover: 无法区分该文件未定义或应用文件");
 		}
 	},
 });

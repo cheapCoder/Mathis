@@ -25,3 +25,7 @@ export function getRestrictValue(str: string, expandIndex: number, restricts: st
 	// 去除限制符
 	return str.substring(start + 1, end); // substring不包含结束值
 }
+
+export function getMarkdownListString(list: string[]) {
+	return list.map((key) => `- \`${key}\``).join("\n") + "\n\n";
+}

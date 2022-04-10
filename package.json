@@ -3,8 +3,8 @@
 	"publisher": "happyHacking",
 	"displayName": "Mathis",
 	"description": "一个辅助国际化显示的轻量插件",
-	"version": "0.3.10",
-	"repository": "https://github.com/necessityOVO/mathis",
+	"version": "0.3.11",
+	"repository": "https://github.com/cheapCoder/Mathis",
 	"icon": "img/logo.png",
 	"main": "./out/src/extension.js",
 	"engines": {
@@ -22,6 +22,10 @@
 			{
 				"command": "mathis.colorRef",
 				"title": "update color by shoplazza"
+			},
+			{
+				"command": "mathis.genReport",
+				"title": "generate the locale using report"
 			}
 		],
 		"languages": [
@@ -71,7 +75,7 @@
 						"order": 3,
 						"markdownDescription": "主题升级涉及文件排除:[(使用vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern)",
 						"type": "string",
-						"default": "**/{node_modules,dist,out,test,assets}/**"
+						"default": "**/{node_modules,dist,out,test}/**"
 					},
 					"mathis.defIncludeGlob": {
 						"order": 4,
@@ -83,7 +87,7 @@
 						"order": 5,
 						"markdownDescription": "定义文件排除:[(使用vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern)",
 						"type": "string",
-						"default": "**/{node_modules,dist,out,test,assets}/**"
+						"default": "**/{node_modules,dist,out,test}/**"
 					},
 					"mathis.applyIncludeGlob": {
 						"order": 6,
@@ -95,7 +99,7 @@
 						"order": 7,
 						"markdownDescription": "应用文件排除:[(使用vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern)",
 						"type": "string",
-						"default": "**/{node_modules,dist,out,test,assets}/**"
+						"default": "**/{node_modules,dist,out,test}/**"
 					},
 					"mathis.detectApplyWay": {
 						"order": 9,

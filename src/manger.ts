@@ -17,6 +17,7 @@ class Manger {
 	public async init(context: ExtensionContext) {
 		this.context = context;
 
+		// FIXME:支持工作区
 		// 监听文件修改
 		const watcher = workspace.createFileSystemWatcher(
 			`${workspace.workspaceFolders?.[0].uri.fsPath || "**"}/src/**/*`
@@ -45,9 +46,7 @@ class Manger {
 		await this.updateDef();
 
 		// init apply node
-		await this.updateApply();
-
-		console.log(this);
+		this.updateApply();
 	}
 
 	private async updateDef(list: Uri[] = [...config.defList].map(Uri.file)) {
