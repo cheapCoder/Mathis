@@ -10,7 +10,7 @@
 
 ![](https://github.com/cheapCoder/mathis/blob/develop/img/search.gif?raw=true)
 
-- 生成字段使用报告(`generate the locale using report`)
+- 生成字段使用报告(使用vscode命令`generate the locale using report`)
 
 ![](https://github.com/cheapCoder/mathis/blob/develop/img/report.png?raw=true)
 
