@@ -35,7 +35,7 @@ class Def {
 		const { lang, uri } = meta;
 
 		const res = [];
-		parseJSON(text)["body"]["members"].forEach((n) => {
+		parseJSON(text)["body"]["members"].forEach(n => {
 			try {
 				const keyRange = new Range(
 					n["name"]["loc"]["start"]["line"],
@@ -59,7 +59,9 @@ class Def {
 					defUri: uri,
 					lang,
 				});
-			} catch (error) {}
+			} catch (error) {
+				console.log(error);
+			}
 		});
 
 		return res;
@@ -80,14 +82,14 @@ class Def {
 		}
 
 		const list =
-			ast["body"].find((def) => def.type === "ExportDefaultDeclaration")?.["declaration"] || // 支持export default
-			ast["body"].find((def) => def.type === "ExpressionStatement")?.["expression"]["right"]; //支持module.exports
+			ast["body"].find(def => def.type === "ExportDefaultDeclaration")?.["declaration"] || // 支持export default
+			ast["body"].find(def => def.type === "ExpressionStatement")?.["expression"]["right"]; //支持module.exports
 		if (!list) {
 			return [];
 		}
 
 		return list["properties"]
-			.map((n) => {
+			.map(n => {
 				try {
 					// acorn ast loc contains the one-based line and zero-based column numbers, but vscode position define the one-based line and one-based column numbers
 					// 且acorn返回的loc包含start不包含end，同时位置需要去除引号导致的偏差，统一保存为one-based
@@ -114,7 +116,7 @@ class Def {
 						lang,
 					};
 				} catch (error) {
-					// console.log(error);
+					console.log(error);
 				}
 			})
 			.filter(Boolean);

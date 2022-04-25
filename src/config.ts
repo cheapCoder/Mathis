@@ -40,6 +40,7 @@ class Config {
 	public applyExcludeGlob = "";
 
 	// for主题升级
+	public useThemeUpdate = false;
 	public themeUpdateLink = "";
 	public themeUpdateIncludeGlob = "";
 	public themeUpdateExcludeGlob = "";
@@ -53,13 +54,13 @@ class Config {
 	}
 
 	async init() {
-		await Promise.all([this.distinguishFiles(), this.findI18nLib()]);
+		Promise.all([this.distinguishFiles(), this.findI18nLib()]);
 	}
 
 	private mergeConfig() {
 		const conf = workspace.getConfiguration(this.projectName);
 
-		Object.keys(this).forEach((key) => {
+		Object.keys(this).forEach(key => {
 			if (conf[key] && !(this[key] instanceof Function)) {
 				this[key] = conf[key];
 			}
@@ -70,14 +71,14 @@ class Config {
 		// 查找定义文件
 		// ts,js,json格式的多语言文件
 		this.defList = new Set(
-			(await workspace.findFiles(this.defIncludeGlob, this.defExcludeGlob)).map((v) => v.fsPath)
+			(await workspace.findFiles(this.defIncludeGlob, this.defExcludeGlob)).map(v => v.fsPath)
 		);
 
 		// 查找应用文件, 过滤匹配的locale定义文件
 		this.applyList = new Set(
 			(await workspace.findFiles(this.applyIncludeGlob, this.applyExcludeGlob))
-				.map((v) => v.fsPath)
-				.filter((al) => !this.defList.has(al))
+				.map(v => v.fsPath)
+				.filter(al => !this.defList.has(al))
 		);
 	}
 
@@ -89,7 +90,7 @@ class Config {
 
 			this.i18nLib = Object.keys(this.libFormatRegMap).find(
 				// devDependencies
-				(name) => packageJson["dependencies"]?.[name] || packageJson["devDependencies"]?.[name]
+				name => packageJson["dependencies"]?.[name] || packageJson["devDependencies"]?.[name]
 			) as I18nLibType;
 		} catch (e) {
 			// console.log("未发现package.json文件或i18n库依赖");

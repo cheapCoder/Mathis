@@ -56,6 +56,7 @@
 
 | 设置名                  | 类型     | 默认值                                                     | 描述                                                                                                           |
 | ----------------------- | -------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| useThemeUpdate          | boolean  | false                                                      | 是否开启主题升级功能                                                                                            |
 | themeUpdateLink         | string   | "https://assets.shoplazza.com/sds/0.1.1/design-tokens.css" | 主题升级的 css 链接                                                                                            |
 | themeUpdateIgnoreColors | string[] | []                                                         | 替换中忽略的 color                                                                                             |
 | themeUpdateIncludeGlob  | string   | src/\*\*_/_\*                                              | 主题升级涉及文件包含:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |

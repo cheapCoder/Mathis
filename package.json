@@ -50,6 +50,12 @@
 			{
 				"title": "Mathis",
 				"properties": {
+					"mathis.useThemeUpdate": {
+						"order": -1,
+						"description": "是否开启主题升级功能",
+						"type": "boolean",
+						"default": false
+					},
 					"mathis.themeUpdateLink": {
 						"order": 0,
 						"description": "主题升级的css链接",

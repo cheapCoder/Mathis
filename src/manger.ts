@@ -40,8 +40,6 @@ class Manger {
 		);
 		watcher.onDidChange(cell.callback.bind(cell));
 
-		await config.init();
-
 		// init def node
 		await this.updateDef();
 

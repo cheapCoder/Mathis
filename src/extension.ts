@@ -7,15 +7,19 @@ import manger from "./manger";
 import ThemeUpdater from "./theme_update";
 
 export function activate(context: ExtensionContext) {
-	const themeUpdater = new ThemeUpdater(context);
+	config.init().then(() => {
+		if (config.useThemeUpdate) {
+			new ThemeUpdater(context);
+		}
 
-	manger.init(context);
+		manger.init(context);
+	});
 	const hoverDis = languages.registerHoverProvider(config.activeFileLanguage, dispatchHover());
 
 	// StatusBarItem
-	Object.values(barItems).forEach((fn) => fn());
+	Object.values(barItems).forEach(fn => fn());
 	// @ts-ignore Commands
-	context.subscriptions.push(hoverDis, ...Object.keys(commands).map((name) => commands[name]));
+	context.subscriptions.push(hoverDis, ...Object.keys(commands).map(name => commands[name]));
 }
 
 export function deactivate() {}
