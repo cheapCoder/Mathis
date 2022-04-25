@@ -54,7 +54,7 @@ class Config {
 	}
 
 	async init() {
-		Promise.all([this.distinguishFiles(), this.findI18nLib()]);
+		await Promise.all([this.distinguishFiles(), this.findI18nLib()]);
 	}
 
 	private mergeConfig() {

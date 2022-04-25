@@ -29,7 +29,7 @@ const showDefHover = (document: TextDocument, position: Position) => {
 	}
 
 	const markdownStrings: MarkdownString[] = [];
-	defList.forEach((node) => {
+	defList.forEach(node => {
 		const ms = new MarkdownString(
 			`${node.lang}: ${node.value} [$(keybindings-edit)](command:mathis.navigateToDef?${encodeURIComponent(
 				JSON.stringify(node)
@@ -58,7 +58,7 @@ const showApplyHover = (document: TextDocument, position: Position) => {
 		return;
 	}
 
-	const key = manger.defFileBuckets.get(document.uri.fsPath)?.find((key) => {
+	const key = manger.defFileBuckets.get(document.uri.fsPath)?.find(key => {
 		const node = manger.defMap.get(key)?.get(document.uri.fsPath);
 		return (
 			(node?.keyRange.start.isBeforeOrEqual(position) && node?.keyRange.end.isAfterOrEqual(position)) ||
@@ -71,7 +71,7 @@ const showApplyHover = (document: TextDocument, position: Position) => {
 	}
 
 	return new Hover(
-		(manger.applyMap.get(key) || []).map((apply) => {
+		(manger.applyMap.get(key) || []).map(apply => {
 			const path = config.pathSlice ? apply.loc.uri.fsPath.replace(/^.*src/, "") : apply.loc.uri.fsPath;
 			const ms = new MarkdownString(
 				`地址: [${path}#${apply.loc.range.start.line}](command:mathis.navigateToApply?${encodeURIComponent(

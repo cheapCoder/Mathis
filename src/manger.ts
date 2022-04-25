@@ -26,7 +26,7 @@ class Manger {
 			(list: Uri[][]) => {
 				const dl: Uri[] = [];
 				const al: Uri[] = [];
-				list.forEach((args) => {
+				list.forEach(args => {
 					if (config.defList.has(args[0].fsPath)) {
 						dl.push(args[0]);
 					} else if (config.applyList.has(args[0].fsPath)) {
@@ -44,26 +44,26 @@ class Manger {
 		await this.updateDef();
 
 		// init apply node
-		this.updateApply();
+		await this.updateApply();
 	}
 
 	private async updateDef(list: Uri[] = [...config.defList].map(Uri.file)) {
 		// def node查找
-		const res = await Promise.all(list.map((u) => defParser.parse(u)));
+		const res = await Promise.all(list.map(u => defParser.parse(u)));
 
 		res.forEach((nodeList, i) => {
-			this.defFileBuckets.get(list[i].fsPath)?.forEach((key) => {
+			this.defFileBuckets.get(list[i].fsPath)?.forEach(key => {
 				this.defMap.get(key)?.delete(list[i].fsPath);
 			});
 
 			// 更新记录filepath-key的桶
 			this.defFileBuckets.set(
 				list[i].fsPath,
-				nodeList.map((n) => n.key)
+				nodeList.map(n => n.key)
 			);
 			this.supportLang.add(path.parse(list[i].fsPath).name);
 
-			nodeList.forEach((node) => {
+			nodeList.forEach(node => {
 				if (!this.defMap.has(node.key)) {
 					this.defMap.set(node.key, new Map());
 				}
@@ -74,20 +74,20 @@ class Manger {
 	}
 
 	private async updateApply(list: Uri[] = [...config.applyList].map(Uri.file)) {
-		const res = await Promise.all(list.map((uri) => applyParser.parse(uri, this.defMap)));
+		const res = await Promise.all(list.map(uri => applyParser.parse(uri, this.defMap)));
 
 		// TODO:优化
 		res.forEach((nodeList, i) => {
 			// 记录key-node的map
 			// 先删除原来的key-node记录
-			this.applyFileBuckets.get(list[i].fsPath)?.forEach((key) => {
+			this.applyFileBuckets.get(list[i].fsPath)?.forEach(key => {
 				this.applyMap.set(
 					key,
-					(this.applyMap.get(key) || []).filter((n) => n.loc.uri.fsPath !== list[i].fsPath)
+					(this.applyMap.get(key) || []).filter(n => n.loc.uri.fsPath !== list[i].fsPath)
 				);
 			});
 
-			nodeList.forEach((node) => {
+			nodeList.forEach(node => {
 				if (!this.applyMap.has(node.key)) {
 					this.applyMap.set(node.key, []);
 				}
@@ -97,7 +97,7 @@ class Manger {
 			// 更新记录filepath-key的桶
 			this.applyFileBuckets.set(
 				list[i].fsPath,
-				nodeList.map((node) => node.key)
+				nodeList.map(node => node.key)
 			);
 		});
 	}
