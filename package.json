@@ -3,7 +3,7 @@
 	"publisher": "happyHacking",
 	"displayName": "Mathis",
 	"description": "shoplazza vscode 工具集(hover显示i18n, token replace)",
-	"version": "0.3.13",
+	"version": "0.4.0",
 	"repository": "https://github.com/cheapCoder/Mathis",
 	"icon": "img/logo.png",
 	"main": "./out/src/extension.js",
