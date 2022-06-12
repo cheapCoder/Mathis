@@ -4,9 +4,10 @@ import { commands, env, Range, Selection, Uri, window, workspace } from "vscode"
 import config from "../config";
 import manger from "../manger";
 import { getMarkdownListString } from "../util";
+import pj from "../../package.json";
 
 // 跳转定义文件
-export const disDefinition = commands.registerCommand("mathis.navigateToDef", (args) => {
+export const disDefinition = commands.registerCommand(`${pj.name}.navigateToDef`, args => {
 	// FIXME:
 	let { defUri, valueRange, keyRange } = args;
 
@@ -30,7 +31,7 @@ export const disDefinition = commands.registerCommand("mathis.navigateToDef", (a
 });
 
 // 复制
-export const disCopy = commands.registerCommand("mathis.copy", ({ value }: { value: string }) => {
+export const disCopy = commands.registerCommand(`${pj.name}.copy`, ({ value }: { value: string }) => {
 	if (!value) {
 		window.showInformationMessage("未找到值...");
 		return;
@@ -41,7 +42,7 @@ export const disCopy = commands.registerCommand("mathis.copy", ({ value }: { val
 });
 
 // 跳转应用文件
-export const disNav = commands.registerCommand("mathis.navigateToApply", (args) => {
+export const disNav = commands.registerCommand(`${pj.name}.navigateToApply`, args => {
 	if (!args) {
 		window.showInformationMessage("缺失参数");
 		return;
@@ -59,7 +60,7 @@ export const disNav = commands.registerCommand("mathis.navigateToApply", (args) 
 });
 
 // 从剪切板中的值查找
-export const disSearch = commands.registerCommand("mathis.searchFromClipboard", async () => {
+export const disSearch = commands.registerCommand(`${pj.name}.searchFromClipboard`, async () => {
 	const val = (await env.clipboard.readText()).trim();
 
 	if (!val) {
@@ -69,11 +70,11 @@ export const disSearch = commands.registerCommand("mathis.searchFromClipboard", 
 	let res: DefNode[] = [];
 	if (manger.defMap.has(val)) {
 		//@ts-ignore
-		res = Array.from(manger.defMap.get(val)).map((entries) => entries[1]);
+		res = Array.from(manger.defMap.get(val)).map(entries => entries[1]);
 	} else {
 		// TODO:等于的字段置顶
-		manger.defMap.forEach((langMap) => {
-			langMap.forEach((node) => {
+		manger.defMap.forEach(langMap => {
+			langMap.forEach(node => {
 				// TODO:该用正则 忽略大小写
 				if (node.value?.includes(val)) {
 					res.push(node);
@@ -92,31 +93,31 @@ export const disSearch = commands.registerCommand("mathis.searchFromClipboard", 
 	);
 	window
 		.showQuickPick(
-			res.map((node) => ({
+			res.map(node => ({
 				label: node.key,
 				description: node.value,
 				detail: node.defUri.fsPath,
 				node,
 			}))
 		)
-		.then((item) => {
-			commands.executeCommand("mathis.navigateToDef", item?.node);
+		.then(item => {
+			commands.executeCommand(`${pj.name}.navigateToDef`, item?.node);
 		});
 });
 
-export const disReport = commands.registerCommand("mathis.genReport", () => {
+export const disReport = commands.registerCommand(`${pj.name}.genReport`, () => {
 	const langs = [...manger.supportLang];
-	const missKeys = Object.fromEntries(langs.map((lan) => [lan, [] as string[]]));
+	const missKeys = Object.fromEntries(langs.map(lan => [lan, [] as string[]]));
 
 	const unUseKey: string[] = [];
 	manger.defMap.forEach((value, key) => {
-		const cur = new Set(Array.from(value).map((v) => parse(v[0]).name));
+		const cur = new Set(Array.from(value).map(v => parse(v[0]).name));
 
 		const apply = manger.applyMap.get(key);
 		if (!apply || !apply.length) {
 			unUseKey.push(key);
 		}
-		langs.forEach((lan) => {
+		langs.forEach(lan => {
 			if (!cur.has(lan)) {
 				missKeys[lan].push(key);
 			}
@@ -128,7 +129,7 @@ export const disReport = commands.registerCommand("mathis.genReport", () => {
 		? `### 未使用的key (${unUseKey.length}/${manger.defMap.size})\n\n` + getMarkdownListString(unUseKey)
 		: "";
 	const missStr = Object.keys(missKeys)
-		.map((lang) => {
+		.map(lang => {
 			if (!missKeys[lang]?.length) {
 				return;
 			}

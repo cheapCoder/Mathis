@@ -3,6 +3,7 @@ import path from "path";
 import config from "../config";
 import manger from "../manger";
 import { getRestrictValue } from "../util";
+import pj from "../../package.json";
 
 export const dispatchHover = () => ({
 	provideHover(document: TextDocument, position: Position) {
@@ -31,9 +32,11 @@ const showDefHover = (document: TextDocument, position: Position) => {
 	const markdownStrings: MarkdownString[] = [];
 	defList.forEach(node => {
 		const ms = new MarkdownString(
-			`${node.lang}: ${node.value} [$(keybindings-edit)](command:mathis.navigateToDef?${encodeURIComponent(
+			`${node.lang}: ${node.value} [$(keybindings-edit)](command:${
+				pj.name
+			}.navigateToDef?${encodeURIComponent(
 				JSON.stringify(node)
-			)} "更改文案")  [$(explorer-view-icon)](command:mathis.copy?${encodeURIComponent(
+			)} "更改文案")  [$(explorer-view-icon)](command:${pj.name}.copy?${encodeURIComponent(
 				JSON.stringify({ value: node.value })
 			)} "复制")`,
 			true
@@ -74,9 +77,9 @@ const showApplyHover = (document: TextDocument, position: Position) => {
 		(manger.applyMap.get(key) || []).map(apply => {
 			const path = config.pathSlice ? apply.loc.uri.fsPath.replace(/^.*src/, "") : apply.loc.uri.fsPath;
 			const ms = new MarkdownString(
-				`地址: [${path}#${apply.loc.range.start.line}](command:mathis.navigateToApply?${encodeURIComponent(
-					JSON.stringify(apply)
-				)} "跳转链接")`,
+				`地址: [${path}#${apply.loc.range.start.line}](command:${
+					pj.name
+				}.navigateToApply?${encodeURIComponent(JSON.stringify(apply))} "跳转链接")`,
 				true
 			);
 

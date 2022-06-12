@@ -2,7 +2,7 @@
 	"name": "mathis",
 	"publisher": "happyHacking",
 	"displayName": "Mathis",
-	"description": "一个辅助国际化显示的轻量插件",
+	"description": "shoplazza vscode 工具集(hover显示i18n, token replace)",
 	"version": "0.3.13",
 	"repository": "https://github.com/cheapCoder/Mathis",
 	"icon": "img/logo.png",
@@ -15,13 +15,13 @@
 	],
 	"activationEvents": [
 		"workspaceContains:**/locale/**/*.{js,ts,jsx,tsx,json}",
-		"onCommand:mathis.colorRef"
+		"onCommand:mathis.replaceAllToken"
 	],
 	"contributes": {
 		"commands": [
 			{
-				"command": "mathis.colorRef",
-				"title": "update color by shoplazza"
+				"command": "mathis.replaceAllToken",
+				"title": "replace all css value using my css design token"
 			},
 			{
 				"command": "mathis.genReport",
@@ -56,30 +56,21 @@
 						"type": "boolean",
 						"default": false
 					},
-					"mathis.themeUpdateLink": {
-						"order": 0,
+					"mathis.tokenLink": {
+						"order": 2,
 						"description": "主题升级的css链接",
 						"type": "string",
-						"default": "https://assets.shoplazza.com/sds/0.1.1/design-tokens.css"
+						"default": "https://assets.shoplazza.com/sds/0.1.61/design-tokens.css"
 					},
-					"mathis.themeUpdateIgnoreColors": {
-						"order": 1,
-						"description": "替换中忽略的color",
-						"type": "array",
-						"items": {
-							"type": "string"
-						},
-						"uniqueItems": true
-					},
-					"mathis.themeUpdateIncludeGlob": {
-						"order": 2,
-						"markdownDescription": "主题升级涉及文件包含:[(使用vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern)",
+					"mathis.includeGlob": {
+						"order": 4,
+						"markdownDescription": "替换token涉及文件包含:[(使用vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern)",
 						"type": "string",
-						"default": "src/**/*"
+						"default": "src/**/*.{css,less,sass,scss}"
 					},
-					"mathis.themeUpdateExcludeGlob": {
-						"order": 3,
-						"markdownDescription": "主题升级涉及文件排除:[(使用vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern)",
+					"mathis.excludeGlob": {
+						"order": 5,
+						"markdownDescription": "替换token涉及文件排除:[(使用vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern)",
 						"type": "string",
 						"default": "**/{node_modules,dist,out,test}/**"
 					},
@@ -173,6 +164,7 @@
 	"dependencies": {
 		"@babel/types": "^7.17.0",
 		"@humanwhocodes/momoa": "^2.0.3",
-		"acorn": "^8.7.0"
+		"acorn": "^8.7.0",
+		"gonzales-pe": "^4.3.0"
 	}
 }

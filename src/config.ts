@@ -41,10 +41,6 @@ class Config {
 
 	// for主题升级
 	public useThemeUpdate = false;
-	public themeUpdateLink = "";
-	public themeUpdateIncludeGlob = "";
-	public themeUpdateExcludeGlob = "";
-	public themeUpdateIgnoreColors = [];
 
 	[key: string]: any;
 

@@ -4,12 +4,12 @@ import { dispatchHover } from "./action/hover";
 import * as barItems from "./action/statusBar";
 import config from "./config";
 import manger from "./manger";
-import ThemeUpdater from "./theme_update";
+import TokenReplacer from "./tokenReplacer";
 
 export function activate(context: ExtensionContext) {
 	config.init().then(() => {
 		if (config.useThemeUpdate) {
-			new ThemeUpdater(context);
+			new TokenReplacer(context);
 		}
 
 		manger.init(context);
