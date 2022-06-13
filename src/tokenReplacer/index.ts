@@ -92,9 +92,9 @@ class StyleToken {
 				let reg = /var\((.*?)\)/gi;
 				let cur;
 				while ((cur = reg.exec(lineText))) {
-					const { val } = self.nameMap.get(cur[1]) || {};
+					const val = self.nameMap.get(cur[1])?.val;
 
-					if (context && position.character >= cur.index && position.character < cur.index + cur[0].length) {
+					if (val && position.character >= cur.index && position.character < cur.index + cur[0].length) {
 						const ms = new MarkdownString(
 							`rgb: ${val} [$(explorer-view-icon)](command:${pj.name}.copy?${encodeURIComponent(
 								JSON.stringify({ value: val })
