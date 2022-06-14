@@ -8,7 +8,7 @@ import TokenReplacer from "./tokenReplacer";
 
 export function activate(context: ExtensionContext) {
 	config.init().then(() => {
-		if (config.useThemeUpdate) {
+		if (config.useTokenReplace) {
 			new TokenReplacer(context);
 		}
 

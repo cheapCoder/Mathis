@@ -1,5 +1,7 @@
 # Mathis
 
+## hover show value
+
 一个辅助国际化显示的 vscode 插件
 
 - 定义位置与应用位置的相互跳转
@@ -10,11 +12,11 @@
 
 ![](https://github.com/cheapCoder/mathis/blob/develop/img/search.gif?raw=true)
 
-- 生成字段使用报告(使用vscode命令`generate the locale using report`)
+- 生成字段使用报告(使用 vscode 命令`generate the locale using report`)
 
 ![](https://github.com/cheapCoder/mathis/blob/develop/img/report.png?raw=true)
 
-## Features
+### Features
 
 - [x] 从应用点 hover 显示定义位置及多语言值
 - [x] 从定义位置 hover 显示应用列表及应用行文本
@@ -27,7 +29,7 @@
 - [ ] def 文件内展示应用还是定义列表
 - [x] 生成多语言使用报告
 
-## Extension Settings
+### Extension Settings
 
 | 设置名           | 类型                                | 默认值                                        | 描述                                                                                                   |
 | ---------------- | ----------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
@@ -43,28 +45,32 @@
 >
 > "split"：文本使用分号分词，逐个在定义列表中查找的方式确定是否为 i18n key(由于不通过 format 函数名匹配，会有多余);
 
-## Something Else
+### Something Else
 
 - 为了简单直接，插件只监听文件的修改(节流 1s)，不监听文件删除，重命名等行为
 - 使用定义文件的文件名作为语言显示
 - 所有位置存储 base-one
 - 内部借助包转化为 ast 获取位置，因此字段定义文件内不能有语法错误
 
-# For theme update
+## For css token replace
 
-![](https://github.com/cheapCoder/mathis/blob/develop/img/color_update.gif?raw=true)
+按`f1`显示所有命令，搜索`replace all css value using my css design token`并确定，即会尝试替换 css 值为对应 css 变量。
 
-| 设置名                  | 类型     | 默认值                                                     | 描述                                                                                                           |
-| ----------------------- | -------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| useThemeUpdate          | boolean  | false                                                      | 是否开启主题升级功能                                                                                            |
-| themeUpdateLink         | string   | "https://assets.shoplazza.com/sds/0.1.1/design-tokens.css" | 主题升级的 css 链接                                                                                            |
-| themeUpdateIgnoreColors | string[] | []                                                         | 替换中忽略的 color                                                                                             |
-| themeUpdateIncludeGlob  | string   | src/\*\*_/_\*                                              | 主题升级涉及文件包含:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
-| themeUpdateExcludeGlob  | string   | \*\*/{node_modules,dist,out,test,assets}/\*\*              | 主题升级涉及文件排除:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
+![](https://github.com/cheapCoder/mathis/blob/develop/img/replace.gif?raw=true)
 
-按`f1`显示所有命令，搜索`color update by shoplazza`并确定，即会尝试替换颜色为 css 变量。
+| 设置名          | 类型    | 默认值                                                    | 描述                                                                                                           |
+| --------------- | ------- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| useTokenReplace | boolean | false                                                     | 是否开启主题升级功能                                                                                           |
+| tokenLink       | string  | https://assets.shoplazza.com/sds/0.1.62/design-tokens.css | 主题升级的 css 链接                                                                                            |
+| includeGlob     | string  | src/\*_/_.{css,less,sass,scss}                            | 主题升级涉及文件包含:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
+| excludeGlob     | string  | **/{node_modules,dist,out,test}/**                        | 主题升级涉及文件排除:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
 
-对于一个给定的颜色：
+#### tokenLink 内的注释标记
+
+- `/* @use(color | font) */`用于插件替换哪些 css 为对应 token，表示用于哪些 css(includes 即可)，`|`分割属性。
+- `/* @ignore */`：忽略下方属性
+
+#### token 处理方式
 
 1. 当存在一个 css 变量对应时，会直接替换(建议在 git 里检查)
 2. 当不存在 css 变量对应时，会添加`warn提示`(黄色波浪底线和弃用横线)
@@ -74,6 +80,8 @@
 3. 当存在多个 css 变量对应时，会添加`info提示`(蓝色波浪底线)。在光标聚焦后,可通过 hover 的`快速修复...`选择替换哪个 css 变量，或者用快捷键`cmd+.`选择
 
 ![](https://github.com/cheapCoder/mathis/blob/develop/img/info_color.png?raw=true)
+
+![](https://github.com/cheapCoder/mathis/blob/develop/img/replace.png?raw=true)
 
 > `info提示`也可在`问题`中快速选择替换哪个变量，详情见 gif
 

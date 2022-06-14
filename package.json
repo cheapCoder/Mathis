@@ -50,7 +50,7 @@
 			{
 				"title": "Mathis",
 				"properties": {
-					"mathis.useThemeUpdate": {
+					"mathis.useTokenReplace": {
 						"order": -1,
 						"description": "是否开启主题升级功能",
 						"type": "boolean",
@@ -60,7 +60,7 @@
 						"order": 2,
 						"description": "主题升级的css链接",
 						"type": "string",
-						"default": "https://assets.shoplazza.com/sds/0.1.61/design-tokens.css"
+						"default": "https://assets.shoplazza.com/sds/0.1.62/design-tokens.css"
 					},
 					"mathis.includeGlob": {
 						"order": 4,
@@ -141,8 +141,8 @@
 		"pretest": "npm run compile && npm run lint",
 		"lint": "eslint src --ext ts",
 		"test": "node ./out/test/runTest.js",
-		"vscode:prepublish": "npm run esbuild-base -- --minify",
-		"esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/src/extension.js --external:vscode --format=cjs --platform=node",
+		"vscode:prepublish": "npm run esbuild-base --minify",
+		"esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/src/extension.js --external:vscode --format=cjs --platform=node --minify",
 		"esbuild": "npm run esbuild-base -- --sourcemap",
 		"esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
 		"test-compile": "tsc -p ./"

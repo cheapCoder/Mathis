@@ -40,7 +40,7 @@ class Config {
 	public applyExcludeGlob = "";
 
 	// for主题升级
-	public useThemeUpdate = false;
+	public useTokenReplace = false;
 
 	[key: string]: any;
 
