@@ -23,11 +23,11 @@
 - [x] 支持复制值
 - [x] 快捷键(cmd+shift+v)或左下角的查找按钮查找值
 - [x] 支持用户设置 locale 路径
-- [ ] 支持检测未使用或定义不完全的字段
-- [ ] 添加缓存，减少插件启动时扫描
+- [x] 支持检测未使用或定义不完全的字段
 - [ ] 支持多工作区
 - [ ] def 文件内展示应用还是定义列表
 - [x] 生成多语言使用报告
+- [x] 请求远程多语言
 
 ### Extension Settings
 
@@ -40,6 +40,7 @@
 | defSelect        | "key" \| "value" \| "key and value" | value                                         | 跳转定义文件时选择字段的哪些部分                                                                       |
 | pathSlice        | boolean                             | true                                          | 显示路径时去除 src 之前的部分                                                                          |
 | statusBar        | boolean                             | true                                          | 在左下方显示查找按钮,其行为与 cmd+shift+v 相同                                                         |
+| remoteLocaleENV  | 	develop \| staging \| production   | production                                    | 远程请求多语言的环境                                                         |
 
 > "reg"：i18n format 函数正则匹配(由于情形众多无法全部匹配，会有缺失);
 >

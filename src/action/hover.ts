@@ -17,30 +17,55 @@ export const dispatchHover = () => ({
 	},
 });
 
+interface HoverCommand {
+	icon: string;
+	command: string;
+	params: Record<string, any>;
+	alt: string;
+}
+
+const formatHoverAction = ({ icon, command, params, alt }: HoverCommand) =>
+	`[$(${icon})](command:${command}?${encodeURIComponent(JSON.stringify(params))} "${alt}")`;
+
 const showDefHover = (document: TextDocument, position: Position) => {
 	const curWord = getRestrictValue(
 		document.lineAt(position.line).text,
 		position.character,
 		config.splitLetters
 	);
-	const defList = manger.defMap.get(curWord);
 
-	if (!defList || defList.size === 0) {
-		return;
+	// TODO:
+	let defList: any = manger.defMap.get(curWord);
+
+	if (!defList || !defList.size) {
+		defList = manger.remoteDefMap.get(curWord);
+		if (!defList) return;
 	}
 
 	const markdownStrings: MarkdownString[] = [];
-	defList.forEach(node => {
-		const ms = new MarkdownString(
-			`${node.lang}: ${node.value} [$(keybindings-edit)](command:${
-				pj.name
-			}.navigateToDef?${encodeURIComponent(
-				JSON.stringify(node)
-			)} "更改文案")  [$(explorer-view-icon)](command:${pj.name}.copy?${encodeURIComponent(
-				JSON.stringify({ value: node.value })
-			)} "复制")`,
-			true
-		);
+	defList.forEach((node: any) => {
+		const hoverCommands: Record<string, HoverCommand> = {
+			update: {
+				icon: "keybindings-edit",
+				command: `${pj.name}.navigateToDef`,
+				params: node,
+				alt: "更改文案",
+			},
+			copy: {
+				icon: "explorer-view-icon",
+				command: `${pj.name}.copy`,
+				params: { value: node.value },
+				alt: "复制",
+			},
+		};
+
+		let str = `${node.lang}: ${node.value}`;
+		if (!defList || !defList.size) {
+			str += " " + formatHoverAction(hoverCommands.update);
+		}
+		str += " " + formatHoverAction(hoverCommands.copy);
+
+		const ms = new MarkdownString(str, true);
 		ms.isTrusted = true;
 		ms.supportHtml = true;
 

@@ -4,12 +4,14 @@ import config from "./config";
 import applyParser from "./parser/apply";
 import defParser from "./parser/def";
 import DelayCell from "./util/DelayCell";
+import { getAppLocaleMessages } from "./util/remote";
 
 class Manger {
 	public i18nLib: I18nLibType;
 	public supportLang: Set<string> = new Set();
 	public context: ExtensionContext | undefined;
 	public defMap: DefMapType = new Map();
+	public remoteDefMap: Map<string, Map<string, { lang: string; value: string }>> = new Map();
 	public defFileBuckets = new Map<string, Array<string>>();
 	public applyMap: ApplyMapType = new Map();
 	public applyFileBuckets = new Map<string, Array<string>>();
@@ -41,7 +43,7 @@ class Manger {
 		watcher.onDidChange(cell.callback.bind(cell));
 
 		// init def node
-		await this.updateDef();
+		await Promise.all([this.fetchRemote(), this.updateDef()]);
 
 		// init apply node
 		await this.updateApply();
@@ -98,6 +100,49 @@ class Manger {
 			this.applyFileBuckets.set(
 				list[i].fsPath,
 				nodeList.map(node => node.key)
+			);
+		});
+	}
+
+	private async fetchRemote() {
+		if (!workspace.name) return;
+		const res = await Promise.all([
+			getAppLocaleMessages({
+				app: "dragon",
+				locale: "zh_CN",
+				env: "production",
+			}),
+			getAppLocaleMessages({
+				app: "dragon",
+				locale: "en_US",
+				env: "production",
+			}),
+			getAppLocaleMessages({
+				app: workspace.name,
+				locale: "zh_CN",
+				env: "production",
+			}),
+			getAppLocaleMessages({
+				app: workspace.name,
+				locale: "en_US",
+				env: "production",
+			}),
+		]);
+
+		if (res.some(obj => !obj)) return;
+
+		const zh = { ...res[0], ...res[2] };
+		const en = { ...res[1], ...res[3] };
+
+		// TODO: zh?
+		Object.keys(en).forEach(k => {
+			this.remoteDefMap.set(
+				k,
+				// 为了和defMap结构统一
+				new Map([
+					["en_US", { lang: "en_US", value: en[k] }],
+					["zh_CN", { lang: "zh_CN", value: zh[k] }],
+				])
 			);
 		});
 	}

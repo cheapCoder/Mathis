@@ -38,6 +38,7 @@ class Config {
 	public defExcludeGlob = "";
 	public applyIncludeGlob = "";
 	public applyExcludeGlob = "";
+	public remoteLocaleENV = "production";
 
 	// for主题升级
 	public useTokenReplace = false;

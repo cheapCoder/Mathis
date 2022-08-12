@@ -116,7 +116,7 @@ class Def {
 						lang,
 					};
 				} catch (error) {
-					console.log(error);
+					// console.log(error);
 				}
 			})
 			.filter(Boolean);

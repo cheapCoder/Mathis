@@ -108,6 +108,17 @@
 							"split"
 						]
 					},
+					"mathis.remoteLocaleENV": {
+						"order": 10,
+						"description": "远程请求多语言的环境",
+						"type": "string",
+						"default": "production",
+						"enum": [
+							"develop",
+							"staging",
+							"production"
+						]
+					},
 					"mathis.defSelect": {
 						"order": 10,
 						"description": "跳转定义文件时选择字段的哪些部分",
