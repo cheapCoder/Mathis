@@ -63,7 +63,7 @@
 | useTokenReplace | boolean | false                                                     | 是否开启主题升级功能                                                                                           |
 | tokenLink       | string  | https://assets.shoplazza.com/sds/0.1.62/design-tokens.css | 主题升级的 css 链接                                                                                            |
 | includeGlob     | string  | src/\*_/_.{css,less,sass,scss}                            | 主题升级涉及文件包含:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
-| excludeGlob     | string  | **/{node_modules,dist,out,test}/**                        | 主题升级涉及文件排除:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
+| excludeGlob     | string  | \*\*/{node_modules,dist,out,test}/\*\*                        | 主题升级涉及文件排除:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
 
 #### tokenLink 内的注释标记
 
