@@ -77,26 +77,19 @@
 					"mathis.defIncludeGlob": {
 						"order": 4,
 						"markdownDescription": "定义文件包含:[(使用vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern)",
-						"type": "string",
-						"default": "src/**/locale/*.{ts,js,json}"
-					},
-					"mathis.defExcludeGlob": {
-						"order": 5,
-						"markdownDescription": "定义文件排除:[(使用vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern)",
-						"type": "string",
-						"default": "**/{node_modules,dist,out,test}/**"
+						"type": "array",
+						"default": [
+							"src/**/locale/*.{ts,js,json}",
+							"node_modules/shoplazza-sdk/es/shoplazza-app/locale/*"
+						]
 					},
 					"mathis.applyIncludeGlob": {
 						"order": 6,
 						"markdownDescription": "应用文件包含:[(使用vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern)",
-						"type": "string",
-						"default": "src/**/*.{ts,js,tsx,jsx,svelte,vue}"
-					},
-					"mathis.applyExcludeGlob": {
-						"order": 7,
-						"markdownDescription": "应用文件排除:[(使用vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern)",
-						"type": "string",
-						"default": "**/{node_modules,dist,out,test}/**"
+						"type": "array",
+						"default": [
+							"src/**/*.{ts,js,tsx,jsx,svelte,vue}"
+						]
 					},
 					"mathis.detectApplyWay": {
 						"order": 9,
@@ -106,17 +99,6 @@
 						"enum": [
 							"reg",
 							"split"
-						]
-					},
-					"mathis.remoteLocaleENV": {
-						"order": 10,
-						"description": "远程请求多语言的环境",
-						"type": "string",
-						"default": "production",
-						"enum": [
-							"develop",
-							"staging",
-							"production"
 						]
 					},
 					"mathis.defSelect": {
@@ -141,6 +123,17 @@
 						"type": "number",
 						"default": 1500,
 						"description": "文件修改后更新节点的延时时间"
+					},
+					"mathis.remoteLocaleENV": {
+						"order": 13,
+						"description": "远程请求多语言的环境",
+						"type": "string",
+						"default": "production",
+						"enum": [
+							"develop",
+							"staging",
+							"production"
+						]
 					}
 				}
 			}

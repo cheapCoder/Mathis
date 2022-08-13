@@ -60,7 +60,7 @@ const showDefHover = (document: TextDocument, position: Position) => {
 		};
 
 		let str = `${node.lang}: ${node.value}`;
-		if (!defList || !defList.size) {
+		if (defList && defList.size) {
 			str += " " + formatHoverAction(hoverCommands.update);
 		}
 		str += " " + formatHoverAction(hoverCommands.copy);

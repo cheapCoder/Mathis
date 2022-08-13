@@ -31,16 +31,15 @@
 
 ### Extension Settings
 
-| 设置名           | 类型                                | 默认值                                        | 描述                                                                                                   |
-| ---------------- | ----------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| defIncludeGlob   | string                              | src/\*\*/locale/{en_US,zh_CN}.{ts,js,json}    | 定义文件包含:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
-| defExcludeGlob   | string                              | \*\*/{node_modules,dist,out,test,assets}/\*\* | 定义文件排除:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
-| applyIncludeGlob | string                              | src/\*_/_.{ts,js,tsx,jsx,svelte,vue}          | 应用文件包含:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
-| detectApplyWay   | "reg" \| "split"                    | split                                         | 检测应用节点的方式<br />reg:正则匹配(会有缺失)); split:分词在 def 中查找(会有多余)                     |
-| defSelect        | "key" \| "value" \| "key and value" | value                                         | 跳转定义文件时选择字段的哪些部分                                                                       |
-| pathSlice        | boolean                             | true                                          | 显示路径时去除 src 之前的部分                                                                          |
-| statusBar        | boolean                             | true                                          | 在左下方显示查找按钮,其行为与 cmd+shift+v 相同                                                         |
-| remoteLocaleENV  | 	develop \| staging \| production   | production                                    | 远程请求多语言的环境                                                         |
+| 设置名           | 类型                                | 默认值                                                                                 | 描述                                                                                                   |
+| ---------------- | ----------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| defIncludeGlob   | string[]                            | ["src/**/locale/*.{ts,js,json}", "node_modules/shoplazza-sdk/es/shoplazza-app/locale"] | 定义文件包含:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
+| applyIncludeGlob | string[]                            | ["src/\*_/_.{ts,js,tsx,jsx,svelte,vue}"]                                               | 应用文件包含:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
+| detectApplyWay   | "reg" \| "split"                    | split                                                                                  | 检测应用节点的方式<br />reg:正则匹配(会有缺失)); split:分词在 def 中查找(会有多余)                     |
+| defSelect        | "key" \| "value" \| "key and value" | value                                                                                  | 跳转定义文件时选择字段的哪些部分                                                                       |
+| pathSlice        | boolean                             | true                                                                                   | 显示路径时去除 src 之前的部分                                                                          |
+| statusBar        | boolean                             | true                                                                                   | 在左下方显示查找按钮,其行为与 cmd+shift+v 相同                                                         |
+| remoteLocaleENV  | develop \| staging \| production    | production                                                                             | 远程请求多语言的环境                                                                                   |
 
 > "reg"：i18n format 函数正则匹配(由于情形众多无法全部匹配，会有缺失);
 >

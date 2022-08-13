@@ -34,10 +34,8 @@ class Config {
 	public pathSlice = true;
 	public statusBar = false;
 	public defSelect = "value";
-	public defIncludeGlob = "";
-	public defExcludeGlob = "";
-	public applyIncludeGlob = "";
-	public applyExcludeGlob = "";
+	public defIncludeGlob: string[] = [];
+	public applyIncludeGlob: string[] = [];
 	public remoteLocaleENV = "production";
 
 	// for主题升级
@@ -68,12 +66,13 @@ class Config {
 		// 查找定义文件
 		// ts,js,json格式的多语言文件
 		this.defList = new Set(
-			(await workspace.findFiles(this.defIncludeGlob, this.defExcludeGlob)).map(v => v.fsPath)
+			(await Promise.all(this.defIncludeGlob.map(reg => workspace.findFiles(reg)))).flat().map(v => v.fsPath)
 		);
 
 		// 查找应用文件, 过滤匹配的locale定义文件
 		this.applyList = new Set(
-			(await workspace.findFiles(this.applyIncludeGlob, this.applyExcludeGlob))
+			(await Promise.all(this.applyIncludeGlob.map(reg => workspace.findFiles(reg))))
+				.flat()
 				.map(v => v.fsPath)
 				.filter(al => !this.defList.has(al))
 		);
