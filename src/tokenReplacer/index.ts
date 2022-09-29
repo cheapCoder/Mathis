@@ -14,7 +14,6 @@ import {
 	Hover,
 	languages,
 	Location,
-	MarkdownString,
 	Position,
 	Range,
 	Selection,
@@ -28,6 +27,7 @@ import {
 import gonzales from "gonzales-pe";
 import path from "path";
 import pj from "../../package.json";
+import { getMdStr, recurFindMapVal } from "./utils";
 
 class StyleToken {
 	public static readonly SOURCE = "STYLE TOKEN";
@@ -35,7 +35,7 @@ class StyleToken {
 	public curColorLink = "";
 	public colorReg = /#([\da-f]{8}|[\da-f]{6}|[\da-f]{3})(?=[;\s])/gi;
 	public valueMap = new Map<string, string[]>();
-	public nameMap = new Map<string, { val: string; usage: true | string[] }>();
+	public nameMap = new Map<string, { final: string; origin: string }>();
 	public diagCollection = languages.createDiagnosticCollection(StyleToken.SOURCE);
 
 	constructor(context: ExtensionContext) {
@@ -46,7 +46,8 @@ class StyleToken {
 			const config = workspace.getConfiguration(pj.name);
 
 			if (self.valueMap.size === 0 || self.curColorLink !== config.tokenLink) {
-				const sourceText = await self.getText();
+				const sourceText = await self.reqTokensFile();
+
 				await self.parseSource(sourceText);
 				self.curColorLink = config.tokenLink;
 			}
@@ -55,6 +56,7 @@ class StyleToken {
 
 			let edits = new WorkspaceEdit();
 			self.diagCollection.clear();
+
 			await Promise.all(files.map(file => self.replaceFileToken(file, edits)));
 			edits.size > 0 && workspace.applyEdit(edits);
 		});
@@ -92,17 +94,15 @@ class StyleToken {
 				let reg = /var\((.*?)\)/gi;
 				let cur;
 				while ((cur = reg.exec(lineText))) {
-					const val = self.nameMap.get(cur[1])?.val;
+					const val = self.nameMap.get(cur[1]);
 
 					if (val && position.character >= cur.index && position.character < cur.index + cur[0].length) {
-						const ms = new MarkdownString(
-							`rgb: ${val} [$(explorer-view-icon)](command:${pj.name}.copy?${encodeURIComponent(
-								JSON.stringify({ value: val })
-							)} "复制")`,
-							true
-						);
-						ms.isTrusted = true;
-						return new Hover(ms);
+						const mdList = [getMdStr("final", val.final)];
+						if (val.final !== val.origin) {
+							mdList.push(getMdStr("origin", val.origin));
+						}
+
+						return new Hover(mdList);
 					}
 				}
 			},
@@ -129,7 +129,7 @@ class StyleToken {
 
 			// @ts-ignore
 			const res: CodeAction[] = (diag["replaceList"] || []).map((val: string) => {
-				const action = new CodeAction(`替换为:${val}`, CodeActionKind.QuickFix);
+				const action = new CodeAction(`${val}`, CodeActionKind.QuickFix);
 				action.command = {
 					command: `${pj.name}.replaceSingleToken`,
 					title: "替换颜色",
@@ -190,29 +190,41 @@ class StyleToken {
 			tree.traverseByType("declaration", (n: any) => {
 				const key = n.content.find((subNode: any) => subNode.type === "property").toString();
 
-				n.content
-					.find((subNode: any) => subNode.type === "value")
-					?.content.filter((subNode: any) => subNode.type !== "space")
-					.forEach((n: any) => {
-						const val = n.toString();
-						const usage = (this.valueMap.get(val) || []).filter(
-							// usage为undefined表示全部可用
-							k =>
-								this.nameMap.get(k)?.usage === true ||
-								(this.nameMap.get(k)?.usage as string[]).some(k => key.includes(k))
-						);
+				const valueNode = n.content.find((subNode: any) => subNode.type === "value");
 
-						usage.length &&
-							res.push({
-								key,
-								val,
-								usage,
-								valoc: new Location(
-									uri,
-									new Range(n.start.line - 1, n.start.column - 1, n.end.line - 1, n.end.column)
-								),
-							});
-					});
+				if (!valueNode) return;
+
+				// 根据空格分组
+				const valueGroup: any[][] = [[]];
+
+				valueNode.content.forEach((subNode: any) => {
+					if (subNode.type !== "space") {
+						valueGroup.at(-1)!.push(subNode);
+					} else {
+						valueGroup.push([]);
+					}
+				});
+
+				valueGroup.forEach(subs => {
+					if (!subs.length) return;
+					let val = subs.reduce((cur, sub) => cur + sub, "");
+					const usage = this.valueMap.get(val) || [];
+					usage.length &&
+						res.push({
+							key,
+							val,
+							usage,
+							valoc: new Location(
+								uri,
+								new Range(
+									subs[0].start.line - 1,
+									subs[0].start.column - 1,
+									subs.at(-1).end.line - 1,
+									subs.at(-1).end.column
+								)
+							),
+						});
+				});
 			});
 		} catch (error) {
 			console.log(error);
@@ -222,7 +234,10 @@ class StyleToken {
 		}
 	}
 
+	private parseFallBack() {}
+
 	public formatColor(val: string) {
+		if (!this.colorReg.test(val)) return val;
 		if (val.length === 9) {
 			// rgba => rgb
 			val = val.slice(0, -2);
@@ -233,7 +248,7 @@ class StyleToken {
 		return val;
 	}
 
-	public async getText(link = workspace.getConfiguration(pj.name).tokenLink): Promise<string> {
+	public async reqTokensFile(link = workspace.getConfiguration(pj.name).tokenLink): Promise<string> {
 		return new Promise<string>((resolve, reject) => {
 			const { hostname, port, pathname: path } = new URL(link);
 
@@ -245,13 +260,9 @@ class StyleToken {
 				res.on("end", () => {
 					resolve(text);
 				});
-				res.on("error", () => {
-					reject();
-				});
+				res.on("error", reject);
 			});
-			req.on("error", () => {
-				reject();
-			});
+			req.on("error", reject);
 			req.end();
 		}).catch(() => {
 			window.showErrorMessage("token链接解析出现错误");
@@ -263,64 +274,28 @@ class StyleToken {
 		this.nameMap.clear();
 		this.valueMap.clear();
 
-		// let text = "";
-		// try {
-		// 	text = await this.getText(link);
-		// } catch (e) {
-		// 	console.log(e);
-		// 	window.showErrorMessage("css token源解析失败");
-		// }
-		// text = text.replace(/\n/g, "");
+		const tree = gonzales.parse(text, { syntax: "css" });
 
-		// let repeatNameList = new Set();
-		let reg = /(?<=.*?\{)[\w\W]*?(?=\})/g;
-		// 每个css对象
-		text.match(reg)?.forEach(s => {
-			let curTypes: boolean | string[]; // true: 接收所有属性； false: 忽略此token; string[]: 可包含的css属性名子串
-			let res: string;
-			const lines = s.split(";").map(l => l.trim());
-			// 每行
-			lines.forEach(line => {
-				if (!line) return;
+		// 只取第一个body的值，忽略组件的变量
+		tree.content[0].traverseByTypes(["declaration"], (n: any) => {
+			this.nameMap.set(n.content[0].toString(), { origin: n.content[2].toString(), final: "" });
 
-				// 注释行
-				if ((res = line.match(/(?<=\/\*.*?)@.*?(?=\*\/)/g)?.[0] || "")) {
-					if (res.startsWith("@use")) {
-						curTypes = res
-							.match(/(?<=@use\().*?(?=\))/g)![0]
-							.split("|")
-							.map(s => s.trim());
-
-						curTypes[0] === "*" && (curTypes = true);
-					} else if (res.startsWith("@ignore")) {
-						curTypes = false;
-					}
-				} else {
-					// 为false忽略此token
-					if (!curTypes) return;
-
-					// css行
-					let item = line.split(":").map(v => v.trim().toLowerCase());
-					// if (this.nameMap.has(item[0])) {
-					// 	repeatNameList.add(item[0]);
-					// }
-					// 添加name-value
-					this.nameMap.set(item[0], { val: item[1], usage: curTypes });
-
-					// 格式化颜色
-					if (this.colorReg.test(item[1] + ";")) {
-						item[1] = this.formatColor(item[1]);
-					}
-					// 添加value - name[]
-					if (!this.valueMap.has(item[1])) {
-						this.valueMap.set(item[1], []);
-					}
-					this.valueMap.get(item[1])?.push(item[0]);
-				}
-			});
+			// // 格式化颜色
+			// if (this.colorReg.test(item[1] + ";")) {
+			// 	item[1] = this.formatColor(item[1]);
+			// }
 		});
-		// console.log(this.nameMap);
-		// console.log(this.valueMap);
+
+		// recursive find `var()` value to final val
+		this.nameMap.forEach((val, key) => {
+			val.final = recurFindMapVal(key, this.nameMap) || val.origin;
+
+			// 添加value - name[]
+			if (!this.valueMap.has(val.final)) {
+				this.valueMap.set(val.final, []);
+			}
+			this.valueMap.get(val.final)?.push(key);
+		});
 	}
 }
 

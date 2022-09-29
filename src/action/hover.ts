@@ -24,7 +24,7 @@ interface HoverCommand {
 	alt: string;
 }
 
-const formatHoverAction = ({ icon, command, params, alt }: HoverCommand) =>
+export const formatHoverAction = ({ icon, command, params, alt }: HoverCommand) =>
 	`[$(${icon})](command:${command}?${encodeURIComponent(JSON.stringify(params))} "${alt}")`;
 
 const showDefHover = (document: TextDocument, position: Position) => {
