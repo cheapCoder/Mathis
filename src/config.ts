@@ -32,6 +32,7 @@ class Config {
 	public delayTime = 1500;
 	public detectApplyWay = "split";
 	public pathSlice = true;
+	public useCompletion = false;
 	public statusBar = false;
 	public defSelect = "value";
 	public define: { include: string; exclude: string }[] = [];

@@ -33,13 +33,13 @@ const showDefHover = (document: TextDocument, position: Position) => {
 
 	let defList: any = manger.defMap.get(curWord);
 	let fromRemote = false;
-	const markdownStrings: MarkdownString[] = [];
 	if (!defList || !defList.size) {
 		defList = manger.remoteDefMap.get(curWord);
 		if (!defList) return;
 		fromRemote = true;
 	}
 
+	const markdownStrings: MarkdownString[] = [];
 	defList.forEach((node: any) => {
 		const hoverCommands: Record<string, HoverCommand> = {
 			update: {

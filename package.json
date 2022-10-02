@@ -147,6 +147,12 @@
 							"key and value"
 						]
 					},
+					"mathis.useCompletion": {
+						"order": 11,
+						"description": "是否开启自动填充功能",
+						"type": "boolean",
+						"default": false
+					},
 					"mathis.pathSlice.enabled": {
 						"order": 11,
 						"type": "boolean",

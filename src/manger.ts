@@ -16,6 +16,10 @@ class Manger {
 	public applyMap: ApplyMapType = new Map();
 	public applyFileBuckets = new Map<string, Array<string>>();
 
+	public get keys() {
+		return [...new Set([...this.defMap.keys(), ...this.remoteDefMap.keys()])];
+	}
+
 	public async init(context: ExtensionContext) {
 		this.context = context;
 
