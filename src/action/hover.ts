@@ -1,8 +1,7 @@
-import { Hover, MarkdownString, Position, TextDocument, window } from "vscode";
+import { Hover, MarkdownString, Position, TextDocument, workspace } from "vscode";
 import path from "path";
 import config from "../config";
 import manger from "../manger";
-import { getRestrictValue } from "../util";
 import pj from "../../package.json";
 
 export const dispatchHover = () => ({
@@ -28,21 +27,19 @@ export const formatHoverAction = ({ icon, command, params, alt }: HoverCommand) 
 	`[$(${icon})](command:${command}?${encodeURIComponent(JSON.stringify(params))} "${alt}")`;
 
 const showDefHover = (document: TextDocument, position: Position) => {
-	const curWord = getRestrictValue(
-		document.lineAt(position.line).text,
-		position.character,
-		config.splitLetters
-	);
+	const pos = document.getWordRangeAtPosition(position, /[$_a-z\.]+/i);
+	if (!pos) return;
+	const curWord = document.getText(pos);
 
-	// TODO:
 	let defList: any = manger.defMap.get(curWord);
-
+	let fromRemote = false;
+	const markdownStrings: MarkdownString[] = [];
 	if (!defList || !defList.size) {
 		defList = manger.remoteDefMap.get(curWord);
 		if (!defList) return;
+		fromRemote = true;
 	}
 
-	const markdownStrings: MarkdownString[] = [];
 	defList.forEach((node: any) => {
 		const hoverCommands: Record<string, HoverCommand> = {
 			update: {
@@ -60,7 +57,7 @@ const showDefHover = (document: TextDocument, position: Position) => {
 		};
 
 		let str = `${node.lang}: ${node.value}`;
-		if (defList && defList.size) {
+		if (!fromRemote) {
 			str += " " + formatHoverAction(hoverCommands.update);
 		}
 		str += " " + formatHoverAction(hoverCommands.copy);
@@ -100,7 +97,11 @@ const showApplyHover = (document: TextDocument, position: Position) => {
 
 	return new Hover(
 		(manger.applyMap.get(key) || []).map(apply => {
-			const path = config.pathSlice ? apply.loc.uri.fsPath.replace(/^.*src/, "") : apply.loc.uri.fsPath;
+			const path = config.pathSlice
+				? apply.loc.uri.fsPath
+						.replace(workspace.getWorkspaceFolder(apply.loc.uri)?.uri.fsPath || "", "")
+						.replace(/^\/src/, "")
+				: apply.loc.uri.fsPath;
 			const ms = new MarkdownString(
 				`地址: [${path}#${apply.loc.range.start.line}](command:${
 					pj.name

@@ -27,5 +27,5 @@ export function getRestrictValue(str: string, expandIndex: number, restricts: st
 }
 
 export function getMarkdownListString(list: string[]) {
-	return list.map((key) => `- \`${key}\``).join("\n") + "\n\n";
+	return list.map(key => `- \`${key}\``).join("\n") + "\n\n";
 }

@@ -34,8 +34,8 @@ class Config {
 	public pathSlice = true;
 	public statusBar = false;
 	public defSelect = "value";
-	public defIncludeGlob: string[] = [];
-	public applyIncludeGlob: string[] = [];
+	public define: { include: string; exclude: string }[] = [];
+	public apply: { include: string; exclude: string }[] = [];
 	public remoteLocaleENV = "production";
 
 	// for主题升级
@@ -50,6 +50,7 @@ class Config {
 
 	async init() {
 		await Promise.all([this.distinguishFiles(), this.findI18nLib()]);
+		// console.log(this);
 	}
 
 	private mergeConfig() {
@@ -66,12 +67,14 @@ class Config {
 		// 查找定义文件
 		// ts,js,json格式的多语言文件
 		this.defList = new Set(
-			(await Promise.all(this.defIncludeGlob.map(reg => workspace.findFiles(reg)))).flat().map(v => v.fsPath)
+			(await Promise.all(this.define.map(({ exclude, include }) => workspace.findFiles(include, exclude))))
+				.flat()
+				.map(v => v.fsPath)
 		);
 
 		// 查找应用文件, 过滤匹配的locale定义文件
 		this.applyList = new Set(
-			(await Promise.all(this.applyIncludeGlob.map(reg => workspace.findFiles(reg))))
+			(await Promise.all(this.apply.map(({ include, exclude }) => workspace.findFiles(include, exclude))))
 				.flat()
 				.map(v => v.fsPath)
 				.filter(al => !this.defList.has(al))

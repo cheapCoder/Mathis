@@ -227,14 +227,11 @@ class StyleToken {
 				});
 			});
 		} catch (error) {
-			console.log(error);
+			// console.log(error);
 		} finally {
-			// console.log(res);
 			return res;
 		}
 	}
-
-	private parseFallBack() {}
 
 	public formatColor(val: string) {
 		if (!this.colorReg.test(val)) return val;

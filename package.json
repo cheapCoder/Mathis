@@ -60,7 +60,7 @@
 						"order": 2,
 						"description": "主题升级的css链接",
 						"type": "string",
-						"default": "https://assets.shoplazza.com/sds/0.1.62/design-tokens.css"
+						"default": "https://assets.shoplazza.com/sds/0.1.63/design-tokens.css"
 					},
 					"mathis.includeGlob": {
 						"order": 4,
@@ -74,21 +74,56 @@
 						"type": "string",
 						"default": "**/{node_modules,dist,out,test}/**"
 					},
-					"mathis.defIncludeGlob": {
+					"mathis.define": {
 						"order": 4,
 						"markdownDescription": "定义文件包含:[(使用vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern)",
 						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"include": {
+									"type": "string",
+									"markdownDescription": "参考findFiles Api[参考](https://code.visualstudio.com/api/references/vscode-api#workspace)"
+								},
+								"exclude": {
+									"type": "string",
+									"markdownDescription": "参考findFiles Api[参考](https://code.visualstudio.com/api/references/vscode-api#workspace)"
+								}
+							}
+						},
 						"default": [
-							"src/**/locale/*.{ts,js,json}",
-							"node_modules/shoplazza-sdk/es/shoplazza-app/locale/*"
+							{
+								"include": "{components,src}/**/locale/*.{ts,tsx,jsx,js,json}",
+								"exclude": "**/{node_modules,test,__tests__}/**"
+							},
+							{
+								"include": "node_modules/shoplazza-sdk/es/shoplazza-app/locale/*",
+								"exclude": ""
+							}
 						]
 					},
-					"mathis.applyIncludeGlob": {
+					"mathis.apply": {
 						"order": 6,
-						"markdownDescription": "应用文件包含:[(使用vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern)",
+						"markdownDescription": "findFile使用的参数[参考glob](https://code.visualstudio.com/api/references/vscode-api#GlobPattern)",
 						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"include": {
+									"type": "string",
+									"markdownDescription": "参考findFiles Api[参考](https://code.visualstudio.com/api/references/vscode-api#workspace)"
+								},
+								"exclude": {
+									"type": "string",
+									"markdownDescription": "参考findFiles Api[参考](https://code.visualstudio.com/api/references/vscode-api#workspace)"
+								}
+							}
+						},
 						"default": [
-							"src/**/*.{ts,js,tsx,jsx,svelte,vue}"
+							{
+								"include": "{components,src}/**/*.{ts,js,tsx,jsx,svelte,vue}",
+								"exclude": "**/{node_modules,test,__tests__}/**"
+							}
 						]
 					},
 					"mathis.detectApplyWay": {
@@ -166,7 +201,6 @@
 		"typescript": "^4.6.2"
 	},
 	"dependencies": {
-		"@babel/types": "^7.17.0",
 		"@humanwhocodes/momoa": "^2.0.3",
 		"acorn": "^8.7.0",
 		"gonzales-pe": "^4.3.0"

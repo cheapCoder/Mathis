@@ -16,30 +16,28 @@
 
 ![](https://github.com/cheapCoder/mathis/blob/develop/img/report.png?raw=true)
 
-### Features
+### TODO
 
 - [x] 从应用点 hover 显示定义位置及多语言值
 - [x] 从定义位置 hover 显示应用列表及应用行文本
-- [x] 支持复制值
-- [x] 快捷键(cmd+shift+v)或左下角的查找按钮查找值
+- [x] 支持复制
+- [x] 快捷键(cmd+shift+v)查找值
 - [x] 支持用户设置 locale 路径
 - [x] 支持检测未使用或定义不完全的字段
-- [ ] 支持多工作区
 - [ ] def 文件内展示应用还是定义列表
 - [x] 生成多语言使用报告
 - [x] 请求远程多语言
 
 ### Extension Settings
 
-| 设置名           | 类型                                | 默认值                                                                                 | 描述                                                                                                   |
-| ---------------- | ----------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| defIncludeGlob   | string[]                            | ["src/**/locale/*.{ts,js,json}", "node_modules/shoplazza-sdk/es/shoplazza-app/locale"] | 定义文件包含:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
-| applyIncludeGlob | string[]                            | ["src/\*_/_.{ts,js,tsx,jsx,svelte,vue}"]                                               | 应用文件包含:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
-| detectApplyWay   | "reg" \| "split"                    | split                                                                                  | 检测应用节点的方式<br />reg:正则匹配(会有缺失)); split:分词在 def 中查找(会有多余)                     |
-| defSelect        | "key" \| "value" \| "key and value" | value                                                                                  | 跳转定义文件时选择字段的哪些部分                                                                       |
-| pathSlice        | boolean                             | true                                                                                   | 显示路径时去除 src 之前的部分                                                                          |
-| statusBar        | boolean                             | true                                                                                   | 在左下方显示查找按钮,其行为与 cmd+shift+v 相同                                                         |
-| remoteLocaleENV  | develop \| staging \| production    | production                                                                             | 远程请求多语言的环境                                                                                   |
+| 设置名          | 类型                                   | 默认值     | 描述                                                                                                   |
+| --------------- | -------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------ |
+| define          | { include: string; exclude: string }[] |            | 定义文件包含:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
+| apply           | { include: string; exclude: string }[] |            | 应用文件包含:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
+| detectApplyWay  | "reg" \| "split"                       | split      | 检测应用节点的方式<br />reg:正则匹配(会有缺失)); split:分词在 def 中查找(会有多余)                     |
+| defSelect       | "key" \| "value" \| "key and value"    | value      | 跳转定义文件时选择字段的哪些部分                                                                       |
+| pathSlice       | boolean                                | true       | 显示路径时去除 src 之前的部分                                                                          |
+| remoteLocaleENV | develop \| staging \| production       | production | 远程请求多语言的环境                                                                                   |
 
 > "reg"：i18n format 函数正则匹配(由于情形众多无法全部匹配，会有缺失);
 >
@@ -63,12 +61,7 @@
 | useTokenReplace | boolean | false                                                     | 是否开启主题升级功能                                                                                           |
 | tokenLink       | string  | https://assets.shoplazza.com/sds/0.1.62/design-tokens.css | 主题升级的 css 链接                                                                                            |
 | includeGlob     | string  | src/\*_/_.{css,less,sass,scss}                            | 主题升级涉及文件包含:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
-| excludeGlob     | string  | \*\*/{node_modules,dist,out,test}/\*\*                        | 主题升级涉及文件排除:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
-
-#### tokenLink 内的注释标记
-
-- `/* @use(color | font) */`用于插件替换哪些 css 为对应 token，表示用于哪些 css(includes 即可)，`|`分割属性。
-- `/* @ignore */`：忽略下方属性
+| excludeGlob     | string  | \*\*/{node_modules,dist,out,test}/\*\*                    | 主题升级涉及文件排除:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
 
 #### token 处理方式
 

@@ -17,7 +17,7 @@ class ApplyParser {
 		if (!config.i18nLib) {
 			return [];
 		}
-		config.libFormatRegMap[config.i18nLib].forEach((reg) => {
+		config.libFormatRegMap[config.i18nLib].forEach(reg => {
 			let tem;
 			const r = new RegExp(reg, "g");
 			while ((tem = r.exec(text))) {
@@ -46,23 +46,25 @@ class ApplyParser {
 		const res: ApplyNode[] = [];
 
 		for (let line = 1; line <= document.lineCount; line++) {
-			const lineWord = config.splitLetters.flatMap((s) => document.lineAt(line - 1).text.split(s));
+			config.splitLetters.forEach(split => {
+				const lineWord = document.lineAt(line - 1).text.split(split);
 
-			let column = 1;
-			// 保证顺序遍历
-			for (let i = 0; i < lineWord.length; i++) {
-				if (defMap.get(lineWord[i])) {
-					const range = new Range(line, column, line, column + lineWord[i].length - 1);
+				let column = 1;
+				// 保证顺序遍历
+				for (let i = 0; i < lineWord.length; i++) {
+					if (defMap.get(lineWord[i])) {
+						const range = new Range(line, column, line, column + lineWord[i].length - 1);
 
-					res.push({
-						key: lineWord[i],
-						loc: new Location(document.uri, range),
-						code: document.lineAt(line - 1).text.trim(),
-						languageId: document.languageId,
-					});
+						res.push({
+							key: lineWord[i],
+							loc: new Location(document.uri, range),
+							code: document.lineAt(line - 1).text.trim(),
+							languageId: document.languageId,
+						});
+					}
+					column += lineWord[i].length + 1;
 				}
-				column += lineWord[i].length + 1;
-			}
+			});
 		}
 		return res;
 	}

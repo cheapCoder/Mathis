@@ -47,6 +47,7 @@ class Manger {
 
 		// init apply node
 		await this.updateApply();
+		// console.log(this);
 	}
 
 	private async updateDef(list: Uri[] = [...config.defList].map(Uri.file)) {
