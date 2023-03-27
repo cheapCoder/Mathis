@@ -27,7 +27,7 @@ export const formatHoverAction = ({ icon, command, params, alt }: HoverCommand) 
 	`[$(${icon})](command:${command}?${encodeURIComponent(JSON.stringify(params))} "${alt}")`;
 
 const showDefHover = (document: TextDocument, position: Position) => {
-	const pos = document.getWordRangeAtPosition(position, /[$_a-z\.]+/i);
+	const pos = document.getWordRangeAtPosition(position, /[$_a-z0-9A-Z\.]+/i);
 	if (!pos) return;
 	const curWord = document.getText(pos);
 
