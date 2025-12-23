@@ -1,34 +1,60 @@
 import config from "../config";
 
-export default class DelayCell {
-	private cell: Set<string> = new Set();
-	private args: any[] = [];
-	private fn; // 调用时传入二维数组，一层的每一项为每次函数调用传入的rest数组
+export interface FileChangeEvent {
+	type: "create" | "change" | "delete";
+	uri: import("vscode").Uri;
+	fileType: "def" | "apply" | "unknown";
+}
+
+export default class DelayCell<T = FileChangeEvent, K = string> {
+	private pending: Map<K, T> = new Map();
+	private timer: NodeJS.Timeout | null = null;
+	private fn: (list: T[]) => void;
+	private keyFn: (item: T) => K;
 	private delay: number;
-	private callThis: object;
-	private compareFn: Function;
-	constructor(fn: Function, compareFn: Function, delay?: number, callThis?: object) {
+
+	constructor(fn: (list: T[]) => void, keyFn: (item: T) => K, delay?: number) {
 		this.fn = fn;
-		this.compareFn = compareFn;
+		this.keyFn = keyFn;
 		this.delay = delay || config.delayTime;
-		this.callThis = callThis || globalThis;
 	}
 
-	public callback(...rest: any[]) {
-		const com = this.compareFn(...rest);
+	public add(item: T): void {
+		const key = this.keyFn(item);
 
-		if (this.cell.has(com)) {
-			return;
+		// 总是更新为最新状态（覆盖旧值）
+		this.pending.set(key, item);
+
+		// 重置定时器实现防抖
+		if (this.timer) {
+			clearTimeout(this.timer);
 		}
 
-		if (this.cell.size === 0) {
-			setTimeout(() => {
-				this.fn.call(this.callThis, this.args);
-				this.cell.clear();
-				this.args = [];
-			}, this.delay);
+		this.timer = setTimeout(() => {
+			const items = Array.from(this.pending.values());
+			this.pending.clear();
+			this.timer = null;
+			this.fn(items);
+		}, this.delay);
+	}
+
+	public flush(): void {
+		if (this.timer) {
+			clearTimeout(this.timer);
+			this.timer = null;
 		}
-		this.args.push(rest);
-		this.cell.add(com);
+		if (this.pending.size > 0) {
+			const items = Array.from(this.pending.values());
+			this.pending.clear();
+			this.fn(items);
+		}
+	}
+
+	public dispose(): void {
+		if (this.timer) {
+			clearTimeout(this.timer);
+			this.timer = null;
+		}
+		this.pending.clear();
 	}
 }

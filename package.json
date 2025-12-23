@@ -197,6 +197,7 @@
 		"@types/glob": "^7.2.0",
 		"@types/mocha": "^9.1.0",
 		"@types/node": "^14.18.12",
+		"@types/sql.js": "^1.4.9",
 		"@types/vscode": "^1.65.0",
 		"@typescript-eslint/eslint-plugin": "^5.15.0",
 		"@typescript-eslint/parser": "^5.15.0",
@@ -209,6 +210,7 @@
 	"dependencies": {
 		"@humanwhocodes/momoa": "^2.0.3",
 		"acorn": "^8.7.0",
-		"gonzales-pe": "^4.3.0"
+		"gonzales-pe": "^4.3.0",
+		"sql.js": "^1.13.0"
 	}
 }
