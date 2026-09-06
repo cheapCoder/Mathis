@@ -5,7 +5,6 @@ import { dispatchHover } from "./action/hover";
 import { indexStatus } from "./action/statusBar";
 import config from "./config";
 import manger from "./manger";
-import TokenReplacer from "./tokenReplacer";
 import { log } from "./util/log";
 
 export function activate(context: ExtensionContext) {
@@ -15,10 +14,6 @@ export function activate(context: ExtensionContext) {
 		log.appendLine(
 			`i18n 库: ${config.i18nLib ?? "未识别"}，定义文件 ${config.defList.size} 个，应用文件 ${config.applyList.size} 个`
 		);
-		if (config.useTokenReplace) {
-			new TokenReplacer(context);
-		}
-
 		await manger.init(context);
 		if (config.defList.size === 0) {
 			indexStatus.noDefs();

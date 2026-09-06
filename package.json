@@ -2,7 +2,7 @@
 	"name": "mathis",
 	"publisher": "happyHacking",
 	"displayName": "Mathis",
-	"description": "shoplazza vscode 工具集(hover显示i18n, token replace)",
+	"description": "辅助国际化的 vscode 插件：hover 显示多语言值，定义与应用位置互跳",
 	"version": "0.6.0",
 	"repository": "https://github.com/cheapCoder/Mathis",
 	"icon": "img/logo.png",
@@ -14,15 +14,10 @@
 		"Other"
 	],
 	"activationEvents": [
-		"workspaceContains:**/locale/**/*.{js,ts,jsx,tsx,json}",
-		"onCommand:mathis.replaceAllToken"
+		"workspaceContains:**/locale/**/*.{js,ts,jsx,tsx,json}"
 	],
 	"contributes": {
 		"commands": [
-			{
-				"command": "mathis.replaceAllToken",
-				"title": "replace all css value using my css design token"
-			},
 			{
 				"command": "mathis.genReport",
 				"title": "generate the locale using report"
@@ -54,30 +49,6 @@
 			{
 				"title": "Mathis",
 				"properties": {
-					"mathis.useTokenReplace": {
-						"order": -1,
-						"description": "是否开启主题升级功能",
-						"type": "boolean",
-						"default": false
-					},
-					"mathis.tokenLink": {
-						"order": 2,
-						"description": "主题升级的css链接",
-						"type": "string",
-						"default": "https://assets.shoplazza.com/sds/0.1.63/design-tokens.css"
-					},
-					"mathis.includeGlob": {
-						"order": 4,
-						"markdownDescription": "替换token涉及文件包含:[(使用vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern)",
-						"type": "string",
-						"default": "src/**/*.{css,less,sass,scss}"
-					},
-					"mathis.excludeGlob": {
-						"order": 5,
-						"markdownDescription": "替换token涉及文件排除:[(使用vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern)",
-						"type": "string",
-						"default": "**/{node_modules,dist,out,test}/**"
-					},
 					"mathis.define": {
 						"order": 4,
 						"markdownDescription": "定义文件包含:[(使用vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern)",
@@ -228,7 +199,6 @@
 	"dependencies": {
 		"@humanwhocodes/momoa": "^2.0.3",
 		"acorn": "^8.7.0",
-		"gonzales-pe": "^4.3.0",
 		"sql.js": "^1.13.0"
 	}
 }

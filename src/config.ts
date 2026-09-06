@@ -41,9 +41,6 @@ class Config {
 	public apply: { include: string; exclude: string }[] = [];
 	public remoteLocaleENV = "production";
 
-	// for主题升级
-	public useTokenReplace = false;
-
 	[key: string]: any;
 
 	constructor() {

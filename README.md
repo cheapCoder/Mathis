@@ -1,7 +1,5 @@
 # Mathis
 
-## hover show value
-
 一个辅助国际化显示的 vscode 插件
 
 - 定义位置与应用位置的相互跳转
@@ -58,34 +56,6 @@
 - 所有位置存储 base-one
 - 内部借助包转化为 ast 获取位置，因此字段定义文件内不能有语法错误
 - next-intl 项目（根 package.json 依赖含 `next-intl`）按 `useTranslations("ns")` / `getTranslations("ns")` 的变量绑定解析 `t("key")` 与 `t.rich/markup/raw/has("key")`，同名变量多次绑定时取调用前最近一次；模板字符串、变量参数等动态 key 不检测，会在报告中被列为未使用
-
-## For css token replace
-
-按`f1`显示所有命令，搜索`replace all css value using my css design token`并确定，即会尝试替换 css 值为对应 css 变量。
-
-![](https://github.com/cheapCoder/mathis/blob/develop/img/replace.gif?raw=true)
-
-| 设置名          | 类型    | 默认值                                                    | 描述                                                                                                           |
-| --------------- | ------- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| useTokenReplace | boolean | false                                                     | 是否开启主题升级功能                                                                                           |
-| tokenLink       | string  | https://assets.shoplazza.com/sds/0.1.62/design-tokens.css | 主题升级的 css 链接                                                                                            |
-| includeGlob     | string  | src/\*_/_.{css,less,sass,scss}                            | 主题升级涉及文件包含:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
-| excludeGlob     | string  | \*\*/{node_modules,dist,out,test}/\*\*                    | 主题升级涉及文件排除:[(使用 vscode glob)](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) |
-
-#### token 处理方式
-
-1. 当存在一个 css 变量对应时，会直接替换(建议在 git 里检查)
-2. 当不存在 css 变量对应时，会添加`warn提示`(黄色波浪底线和弃用横线)
-
-![](https://github.com/cheapCoder/mathis/blob/develop/img/warn_color.png?raw=true)
-
-3. 当存在多个 css 变量对应时，会添加`info提示`(蓝色波浪底线)。在光标聚焦后,可通过 hover 的`快速修复...`选择替换哪个 css 变量，或者用快捷键`cmd+.`选择
-
-![](https://github.com/cheapCoder/mathis/blob/develop/img/info_color.png?raw=true)
-
-![](https://github.com/cheapCoder/mathis/blob/develop/img/replace.png?raw=true)
-
-> `info提示`也可在`问题`中快速选择替换哪个变量，详情见 gif
 
 ### 工具：
 
