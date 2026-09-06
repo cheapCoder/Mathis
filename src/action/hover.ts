@@ -2,6 +2,7 @@ import { Hover, MarkdownString, Position, TextDocument, workspace } from "vscode
 import path from "path";
 import config from "../config";
 import manger from "../manger";
+import { log } from "../util/log";
 import pj from "../../package.json";
 
 export const dispatchHover = () => ({
@@ -11,7 +12,7 @@ export const dispatchHover = () => ({
 		} else if (config.applyList.has(document.fileName)) {
 			return showDefHover(document, position);
 		} else {
-			// console.log("hover: 无法区分该文件未定义或应用文件");
+			log.appendLine(`hover 跳过：${document.fileName} 不在 define/apply 文件列表（apply 共 ${config.applyList.size} 个）`);
 		}
 	},
 });
@@ -30,16 +31,24 @@ const showDefHover = (document: TextDocument, position: Position) => {
 	const pos = document.getWordRangeAtPosition(position, /[$_a-z0-9A-Z\.]+/i);
 	if (!pos) return;
 	const curWord = document.getText(pos);
+	// 命名空间写法下字面量只是 key 的一段，优先用已解析的应用节点拿完整 key
+	const key = manger.getApplyNodeAt(document.uri.fsPath, position.translate(1, 1))?.key ?? curWord;
 
-	let defList: any = manger.defMap.get(curWord);
+	let defList: any = manger.defMap.get(key);
+	log.appendLine(
+		`hover ${path.basename(document.fileName)}:${position.line + 1}:${position.character + 1} 词=${curWord} key=${key} 定义=${defList?.size ?? 0}`
+	);
 	let fromRemote = false;
 	if (!defList || !defList.size) {
-		defList = manger.remoteDefMap.get(curWord);
+		defList = manger.remoteDefMap.get(key);
 		if (!defList) return;
 		fromRemote = true;
 	}
 
 	const markdownStrings: MarkdownString[] = [];
+	if (key !== curWord) {
+		markdownStrings.push(new MarkdownString(`\`${key}\``));
+	}
 	defList.forEach((node: any) => {
 		const hoverCommands: Record<string, HoverCommand> = {
 			update: {

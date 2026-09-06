@@ -4,6 +4,7 @@ import { commands, env, Range, Selection, Uri, window, workspace } from "vscode"
 import config from "../config";
 import manger from "../manger";
 import { getMarkdownListString } from "../util";
+import { log } from "../util/log";
 import pj from "../../package.json";
 
 // 跳转定义文件
@@ -104,6 +105,9 @@ export const disSearch = commands.registerCommand(`${pj.name}.searchFromClipboar
 			commands.executeCommand(`${pj.name}.navigateToDef`, item?.node);
 		});
 });
+
+// 打开 Mathis 输出通道（状态栏点击也走这里）
+export const disShowLog = commands.registerCommand(`${pj.name}.showLog`, () => log.show());
 
 export const disReport = commands.registerCommand(`${pj.name}.genReport`, () => {
 	const langs = [...manger.supportLang];

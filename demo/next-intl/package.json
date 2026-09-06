@@ -1,0 +1,10 @@
+{
+  "name": "mathis-demo-next-intl",
+  "private": true,
+  "description": "Mathis 的 next-intl 示例：嵌套 JSON 文案 + useTranslations 命名空间写法。只供插件识别依赖，不需要安装",
+  "dependencies": {
+    "next": "^16.3.3",
+    "next-intl": "^4.14.0",
+    "react": "^19.2.0"
+  }
+}

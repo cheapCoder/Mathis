@@ -370,6 +370,20 @@ export class LocaleDatabase {
 		return results;
 	}
 
+	public getApplyByFile(filePath: string): ApplyNode[] {
+		if (!this.db) return [];
+		const stmt = this.db.prepare(`SELECT * FROM apply_nodes WHERE file_path = ?`);
+		stmt.bind([filePath]);
+
+		const results: ApplyNode[] = [];
+		while (stmt.step()) {
+			const row = stmt.getAsObject() as unknown as DbApplyNode;
+			results.push(this.rowToApplyNode(row));
+		}
+		stmt.free();
+		return results;
+	}
+
 	public deleteApplyByFile(filePath: string): void {
 		if (!this.db) return;
 		this.db.run(`DELETE FROM apply_nodes WHERE file_path = ?`, [filePath]);

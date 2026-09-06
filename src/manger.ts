@@ -1,10 +1,10 @@
-import path from "path";
-import { Disposable, ExtensionContext, FileSystemWatcher, Uri, workspace } from "vscode";
+import { Disposable, ExtensionContext, FileSystemWatcher, Position, Uri, workspace } from "vscode";
 import config from "./config";
 import { LocaleDatabase } from "./db";
 import applyParser from "./parser/apply";
 import defParser from "./parser/def";
 import DelayCell, { FileChangeEvent } from "./util/DelayCell";
+import { log } from "./util/log";
 import { getAppLocaleMessages } from "./util/remote";
 
 class Manger {
@@ -20,6 +20,10 @@ class Manger {
 
 	public get keys(): string[] {
 		return this.db?.getAllKeys() || [];
+	}
+
+	public get applyKeyCount(): number {
+		return this.db?.getAllApplyKeys().length || 0;
 	}
 
 	public get supportLang(): Set<string> {
@@ -78,31 +82,17 @@ class Manger {
 	public async init(context: ExtensionContext) {
 		this.context = context;
 
-		// 初始化数据库
-		const dbPath = context.globalStorageUri
-			? path.join(context.globalStorageUri.fsPath, "locale.db")
-			: ":memory:";
-
-		// 确保目录存在
-		if (context.globalStorageUri) {
-			try {
-				await workspace.fs.createDirectory(context.globalStorageUri);
-			} catch {
-				// 目录可能已存在
-			}
-		}
-
-		this.db = new LocaleDatabase(dbPath);
+		// 索引只放内存：每次启动都全量重扫，落盘没有收益，反而让多个窗口互相读到别的项目的 key
+		this.db = new LocaleDatabase(":memory:");
 		await this.db.init();
 
 		// 初始化文件监听
 		this.initWatchers();
 
-		// init def node
-		await Promise.all([this.fetchRemote(), this.updateDef()]);
-
-		// init apply node
+		// 先建本地索引；远程多语言不阻塞本地，失败只记日志
+		await this.updateDef();
 		await this.updateApply();
+		this.fetchRemote().catch(e => log.appendLine(`[error] 拉取远程多语言失败: ${e}`));
 	}
 
 	private initWatchers() {
@@ -303,6 +293,13 @@ class Manger {
 	}
 
 	// ========== 数据查询方法（供 action 使用）==========
+
+	// 光标位置（base-one）命中的应用节点，用于从 t("title") 这类不完整字面量拿到解析后的完整 key
+	public getApplyNodeAt(filePath: string, position: Position): ApplyNode | undefined {
+		return this.db
+			?.getApplyByFile(filePath)
+			.find(node => node.loc.range.start.isBeforeOrEqual(position) && node.loc.range.end.isAfterOrEqual(position));
+	}
 
 	public searchDefByValue(searchValue: string): DefNode[] {
 		return this.db?.searchDefByValue(searchValue) || [];

@@ -1,5 +1,9 @@
 // Place your settings in this file to overwrite default and user settings.
 {
+	// 让 Mathis 在本仓库窗口里直接对 demo/next-intl 生效（默认 glob 相对工作区根目录，覆盖不到 demo 子目录）
+	"mathis.i18nLib": "next-intl",
+	"mathis.define": [{ "include": "demo/next-intl/src/**/locale/*.json", "exclude": "**/node_modules/**" }],
+	"mathis.apply": [{ "include": "demo/next-intl/src/**/*.{ts,tsx}", "exclude": "**/node_modules/**" }],
     "files.exclude": {
         "out": false // set this to true to hide the "out" folder with the compiled JS files
     },

@@ -1,11 +1,33 @@
 import { Location, Range, Uri, window, workspace } from "vscode";
 import config from "../config";
+import { scanNextIntlApply } from "./nextIntl";
 
 class ApplyParser {
 	public async parse(uri: Uri, defMap: DefMapType) {
+		// next-intl 的字面量只是 key 的一段（t("title") 对应 agent.title），正则/分词拿不到完整 key
+		if (config.i18nLib === "next-intl") {
+			return this.getApplyOfFileByNamespace(uri);
+		}
 		return config.detectApplyWay === "reg"
 			? this.getApplyOfFileByReg(uri)
 			: this.getApplyOfFileBySplit(uri, defMap);
+	}
+
+	// 检测方式3-按 useTranslations("ns") 绑定解析 t("key") 的完整 key
+	private async getApplyOfFileByNamespace(uri: Uri): Promise<ApplyNode[]> {
+		const document = await workspace.openTextDocument(uri);
+
+		return scanNextIntlApply(document.getText()).map(({ key, start, end }) => {
+			// 偏移量转成项目约定的 base-one 且首尾包含的位置
+			const startPos = document.positionAt(start).translate(1, 1);
+			const endPos = document.positionAt(end - 1).translate(1, 1);
+			return {
+				key,
+				loc: new Location(document.uri, new Range(startPos, endPos)),
+				code: document.lineAt(startPos.line - 1).text.trim(),
+				languageId: document.languageId,
+			};
+		});
 	}
 
 	// 检测方式1-正则表达式

@@ -8,3 +8,10 @@ vsc-extension-quickstart.md
 **/.eslintrc.json
 **/*.map
 **/*.ts
+**/*.test.js
+node_modules/sql.js/dist/sql-asm*
+node_modules/sql.js/dist/*-debug*
+node_modules/sql.js/dist/*.zip
+node_modules/sql.js/dist/worker.*
+out/test/**
+demo/**

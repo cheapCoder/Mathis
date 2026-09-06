@@ -26,6 +26,10 @@
 			{
 				"command": "mathis.genReport",
 				"title": "generate the locale using report"
+			},
+			{
+				"command": "mathis.showLog",
+				"title": "show Mathis log"
 			}
 		],
 		"languages": [
@@ -126,6 +130,18 @@
 							}
 						]
 					},
+					"mathis.i18nLib": {
+						"order": 8,
+						"description": "i18n 库。auto 按工作区根目录 package.json 的依赖识别；根目录不是应用工程（如 monorepo、示例子目录）时手动指定。修改后需重载窗口",
+						"type": "string",
+						"default": "auto",
+						"enum": [
+							"auto",
+							"react-intl",
+							"svelte-i18n",
+							"next-intl"
+						]
+					},
 					"mathis.detectApplyWay": {
 						"order": 9,
 						"description": "检测应用节点的方式\nreg:正则匹配(会有缺失)); split:分词在def中查找(会有多余)",
@@ -183,11 +199,12 @@
 	"scripts": {
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
-		"pretest": "npm run compile && npm run lint",
-		"lint": "eslint src --ext ts",
-		"test": "node ./out/test/runTest.js",
+		"lint": "eslint src test --ext ts",
+		"test": "npm run compile && npm run lint && mocha \"out/src/**/*.test.js\"",
+		"test:e2e": "npm run compile && node ./out/test/runTest.js",
+		"test:visual": "npm run compile && node ./out/test/visual.js",
 		"vscode:prepublish": "npm run esbuild-base --minify",
-		"esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/src/extension.js --external:vscode --format=cjs --platform=node --minify",
+		"esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/src/extension.js --external:vscode --external:sql.js --format=cjs --platform=node --minify",
 		"esbuild": "npm run esbuild-base -- --sourcemap",
 		"esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
 		"test-compile": "tsc -p ./"
@@ -201,10 +218,11 @@
 		"@types/vscode": "^1.65.0",
 		"@typescript-eslint/eslint-plugin": "^5.15.0",
 		"@typescript-eslint/parser": "^5.15.0",
-		"@vscode/test-electron": "^1.6.2",
+		"@vscode/test-electron": "^3.1.0",
 		"esbuild": "^0.14.28",
 		"eslint": "^8.11.0",
 		"mocha": "^9.2.2",
+		"playwright-core": "^1.63.0",
 		"typescript": "^4.6.2"
 	},
 	"dependencies": {

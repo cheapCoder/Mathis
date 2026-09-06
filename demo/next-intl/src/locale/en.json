@@ -1,0 +1,14 @@
+{
+  "common": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "unused": "Nobody references this"
+  },
+  "greeting": {
+    "title": "Hello, {name}",
+    "hint": "Welcome to Mathis",
+    "nested": {
+      "deep": "Three levels deep"
+    }
+  }
+}

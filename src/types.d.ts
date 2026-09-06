@@ -12,7 +12,10 @@ declare interface AstMeta {
 	uri: import("vscode").Uri;
 }
 
-declare type I18nLibType = "react-intl" | "svelte-i18n" | undefined;
+declare type I18nLibType = "react-intl" | "svelte-i18n" | "next-intl" | undefined;
+
+// momoa 2.x 未提供类型声明
+declare module "@humanwhocodes/momoa";
 
 declare type DefMapType = Map<string, Map<string, DefNode>>;
 

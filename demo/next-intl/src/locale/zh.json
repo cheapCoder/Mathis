@@ -1,0 +1,14 @@
+{
+  "common": {
+    "cancel": "取消",
+    "confirm": "确认",
+    "unused": "没人引用的文案"
+  },
+  "greeting": {
+    "title": "你好，{name}",
+    "hint": "欢迎使用 Mathis",
+    "nested": {
+      "deep": "三层嵌套"
+    }
+  }
+}

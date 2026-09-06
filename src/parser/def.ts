@@ -1,8 +1,9 @@
 // @ts-nocheck
 import { Parser } from "acorn";
-import { parse as parseJSON } from "@humanwhocodes/momoa";
+import { parseJsonDef, TextSpan } from "./jsonDef";
 import path from "path";
 import { Range, Uri, workspace } from "vscode";
+import { log } from "../util/log";
 
 class Def {
 	private parserMap: Record<string, Function> = {
@@ -25,46 +26,24 @@ class Def {
 		try {
 			res = this.parserMap[ext.substring(1)](text, { uri, lang });
 		} catch (error) {
-			console.log(error);
+			log.appendLine(`[error] 解析定义文件 ${uri.fsPath} 失败: ${error}`);
 		}
 		return res;
 	}
 
-	// 解析json ast
+	// 解析 json：嵌套对象展平成 a.b.c 形式的完整 key，位置落在叶子上
 	private jsonParse(text: string, meta: AstMeta): DefNode[] {
 		const { lang, uri } = meta;
+		const toRange = (s: TextSpan) => new Range(s.startLine, s.startColumn, s.endLine, s.endColumn);
 
-		const res = [];
-		parseJSON(text)["body"]["members"].forEach(n => {
-			try {
-				const keyRange = new Range(
-					n["name"]["loc"]["start"]["line"],
-					n["name"]["loc"]["start"]["column"] + 1,
-					n["name"]["loc"]["end"]["line"],
-					n["name"]["loc"]["end"]["column"] - 2
-				);
-
-				const valueRange = new Range(
-					n["value"]["loc"]["start"]["line"],
-					n["value"]["loc"]["start"]["column"] + 1,
-					n["value"]["loc"]["end"]["line"],
-					n["value"]["loc"]["end"]["column"] - 2
-				);
-
-				res.push({
-					key: n["name"]["value"],
-					value: n["value"]["value"],
-					keyRange: keyRange,
-					valueRange: valueRange,
-					defUri: uri,
-					lang,
-				});
-			} catch (error) {
-				console.log(error);
-			}
-		});
-
-		return res;
+		return parseJsonDef(text).map(leaf => ({
+			key: leaf.key,
+			value: leaf.value,
+			keyRange: toRange(leaf.keySpan),
+			valueRange: toRange(leaf.valueSpan),
+			defUri: uri,
+			lang,
+		}));
 	}
 
 	// 解析js/ts ast
